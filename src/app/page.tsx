@@ -96,6 +96,55 @@ export default function Dashboard() {
         <StatsCard title="Global Rank" value="#42" icon={Award} trend="Top 1%" color="#10b981" />
       </div>
 
+      {/* 3. Mastery Shortcuts HUD */}
+      <section>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+          <div className="bg-gradient" style={{ width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Rocket size={16} color="white" />
+          </div>
+          <h2 style={{ fontSize: '20px', fontWeight: 800 }}>Mastery Shortcuts</h2>
+          <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, var(--card-border) 0%, transparent 100%)' }} />
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+          {[
+            { id: '1', title: "Generative AI", provider: "Coursera", url: "https://www.coursera.org/learn/generative-ai-with-llms", icon: <BrainCircuit size={18} /> },
+            { id: '3', title: "Kubernetes Mastery", provider: "Coursera", url: "https://www.coursera.org/specializations/architecting-google-kubernetes-engine", icon: <Code2 size={18} /> },
+            { id: '5', title: "Rust Orchestration", provider: "Coursera", url: "https://www.coursera.org/specializations/rust-programming", icon: <Rocket size={18} /> }
+          ].map((track) => (
+            <div key={track.id} className="glass-card hover-glow" style={{ padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderLeft: '4px solid var(--primary)' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', color: 'var(--primary)' }}>
+                  {track.icon}
+                  <span style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '1px' }}>{track.provider}</span>
+                </div>
+                <h3 style={{ fontSize: '16px', fontWeight: 700 }}>{track.title}</h3>
+              </div>
+              <a href={track.url} target="_blank" rel="noopener noreferrer">
+                <button style={{ 
+                  background: track.url.includes('coursera.org') ? '#0056D2' : 'var(--primary)', 
+                  border: 'none', 
+                  color: 'white', 
+                  padding: '8px 16px', 
+                  borderRadius: '8px', 
+                  fontSize: '12px', 
+                  fontWeight: 700, 
+                  cursor: 'pointer', 
+                  boxShadow: track.url.includes('coursera.org') ? '0 4px 12px rgba(0, 86, 210, 0.3)' : '0 4px 12px var(--primary-glow)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  {track.url.includes('coursera.org') && (
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/97/Coursera-Logo_600x600.svg" alt="" style={{ width: '12px', filter: 'brightness(0) invert(1)' }} />
+                  )}
+                  {track.url.includes('coursera.org') ? 'View on Coursera' : 'Start'}
+                </button>
+              </a>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* 3. Streamlined Command Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '40px', alignItems: 'start' }}>
         

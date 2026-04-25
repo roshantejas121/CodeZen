@@ -3,11 +3,11 @@ import { db } from '@/lib/db';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const lessons = db.getLessons();
-    const lesson = lessons.find((l: any) => l.id === params.id);
+    const { id } = await params;
+    const lesson = db.getLesson(id);
     
     if (!lesson) {
       return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });

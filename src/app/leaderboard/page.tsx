@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [mounted, setMounted] = useState(false);
+  const [rankBy, setRankBy] = useState<'xp' | 'karma'>('xp');
 
   useEffect(() => {
     setMounted(true);
@@ -17,8 +18,13 @@ export default function LeaderboardPage() {
 
   if (!mounted) return null;
 
-  const topThree = leaderboard.slice(0, 3);
-  const others = leaderboard.slice(3);
+  const sortedLeaderboard = [...leaderboard].sort((a, b) => {
+    if (rankBy === 'xp') return b.xp - a.xp;
+    return (b.karma || 0) - (a.karma || 0);
+  });
+
+  const topThree = sortedLeaderboard.slice(0, 3);
+  const others = sortedLeaderboard.slice(3);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
@@ -29,7 +35,21 @@ export default function LeaderboardPage() {
           </div>
         </div>
         <h1 style={{ fontSize: '42px', fontWeight: 800, marginBottom: '8px' }}>Top Performers</h1>
-        <p style={{ color: 'var(--text-muted)' }}>Compete with the world's best developers and rise to the top.</p>
+        <p style={{ color: 'var(--text-muted)', marginBottom: '24px' }}>Compete with the world's best developers and rise to the top.</p>
+        
+        {/* Minimalism Toggle */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
+          <button 
+            onClick={() => setRankBy('xp')}
+            style={{ padding: '8px 24px', borderRadius: '20px', fontSize: '13px', fontWeight: 700, border: '1px solid var(--primary)', background: rankBy === 'xp' ? 'var(--primary)' : 'transparent', color: rankBy === 'xp' ? 'white' : 'var(--primary)', cursor: 'pointer', transition: 'all 0.2s' }}>
+            Rank by Belt XP
+          </button>
+          <button 
+            onClick={() => setRankBy('karma')}
+            style={{ padding: '8px 24px', borderRadius: '20px', fontSize: '13px', fontWeight: 700, border: '1px solid #10b981', background: rankBy === 'karma' ? '#10b981' : 'transparent', color: rankBy === 'karma' ? 'white' : '#10b981', cursor: 'pointer', transition: 'all 0.2s' }}>
+            Rank by Karma
+          </button>
+        </div>
       </header>
 
       {/* Podium Section */}
@@ -49,7 +69,9 @@ export default function LeaderboardPage() {
               <div style={{ position: 'absolute', bottom: -5, right: -5, background: '#94a3b8', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700 }}>2</div>
             </div>
             <span style={{ fontWeight: 700, fontSize: '14px' }}>{topThree[1].name}</span>
-            <span style={{ color: 'var(--primary)', fontWeight: 600 }}>{topThree[1].xp.toLocaleString()} XP</span>
+            <span style={{ color: rankBy === 'xp' ? 'var(--primary)' : '#10b981', fontWeight: 600 }}>
+              {rankBy === 'xp' ? `${topThree[1].xp.toLocaleString()} XP` : `${topThree[1].karma} Karma`}
+            </span>
           </motion.div>
         )}
 
@@ -69,7 +91,9 @@ export default function LeaderboardPage() {
               <div style={{ position: 'absolute', bottom: -5, right: -5, background: '#f59e0b', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 800 }}>1</div>
             </div>
             <span style={{ fontWeight: 800, fontSize: '18px' }}>{topThree[0].name}</span>
-            <span style={{ opacity: 0.9, fontWeight: 700 }}>{topThree[0].xp.toLocaleString()} XP</span>
+            <span style={{ opacity: 0.9, fontWeight: 700 }}>
+              {rankBy === 'xp' ? `${topThree[0].xp.toLocaleString()} XP` : `${topThree[0].karma} Karma`}
+            </span>
           </motion.div>
         )}
 
@@ -88,7 +112,9 @@ export default function LeaderboardPage() {
               <div style={{ position: 'absolute', bottom: -5, right: -5, background: '#b45309', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700 }}>3</div>
             </div>
             <span style={{ fontWeight: 700, fontSize: '14px' }}>{topThree[2].name}</span>
-            <span style={{ color: 'var(--primary)', fontWeight: 600 }}>{topThree[2].xp.toLocaleString()} XP</span>
+            <span style={{ color: rankBy === 'xp' ? 'var(--primary)' : '#10b981', fontWeight: 600 }}>
+              {rankBy === 'xp' ? `${topThree[2].xp.toLocaleString()} XP` : `${topThree[2].karma} Karma`}
+            </span>
           </motion.div>
         )}
       </div>
@@ -101,12 +127,22 @@ export default function LeaderboardPage() {
             <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--glass-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>
               {u.name[0]}
             </div>
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px' }}>
               <span style={{ fontWeight: 600 }}>{u.name}</span>
+              {/* Minimalist Badges Render */}
+              {u.badges?.sageLevel && (
+                 <div title="Sage Mentor" style={{ width: 0, height: 0, borderLeft: '5px solid transparent', borderRight: '5px solid transparent', borderBottom: '10px solid #10b981' }} />
+              )}
+              {u.badges?.oracleLevel && (
+                 <div title="Oracle Contributor" style={{ width: '8px', height: '8px', borderRadius: '50%', border: '2px solid #8b5cf6' }} />
+              )}
+              {u.badges?.architectLevel && (
+                 <div title="Architect Reviewer" style={{ width: '8px', height: '8px', background: '#3b82f6' }} />
+              )}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary)', fontWeight: 700 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: rankBy === 'xp' ? 'var(--primary)' : '#10b981', fontWeight: 700 }}>
               <TrendingUp size={16} />
-              {u.xp.toLocaleString()} XP
+              {rankBy === 'xp' ? `${u.xp.toLocaleString()} XP` : `${u.karma} Karma`}
             </div>
           </div>
         ))}

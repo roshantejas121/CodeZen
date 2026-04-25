@@ -1,15 +1,12 @@
 import fs from 'fs';
 import path from 'path';
 
-// A simple, "legit" local JSON database engine
 const DB_PATH = path.join(process.cwd(), 'data', 'db.json');
 
-// Ensure data directory exists
 if (!fs.existsSync(path.join(process.cwd(), 'data'))) {
   fs.mkdirSync(path.join(process.cwd(), 'data'));
 }
 
-// Initial Data Structure (Expanded for a "Real" feel)
 const INITIAL_DATA = {
   user: {
     name: "Roshan Teja",
@@ -18,6 +15,10 @@ const INITIAL_DATA = {
     streak: 15,
     skillLevel: "Advanced",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Roshan",
+    karma: 150,
+    badges: ['Early Adopter'],
+    region: "Asia",
+    country: "IN",
     goals: [
       { id: 1, text: 'Master Rust Ownership Model', completed: false },
       { id: 2, text: 'Build a full-stack Next.js App', completed: true },
@@ -26,330 +27,21 @@ const INITIAL_DATA = {
     certifications: []
   },
   lessons: [
-    { 
-      id: '1', 
-      title: "Generative AI with LLMs", 
-      description: "Learn to build, train, and deploy large language models.", 
-      duration: "3 Weeks", 
-      difficulty: "Advanced", 
-      category: "LLM & AI",
-      xpReward: 5000, 
-      order: 1,
-      certified: true,
-      externalLink: "https://www.deeplearning.ai/courses/generative-ai-with-large-language-models/",
-      content: "Transformer architecture, RLHF, and fine-tuning.",
-      code: "from transformers import AutoModelForCausalLM"
-    },
-    { 
-      id: '2', 
-      title: "Prompt Engineering for Developers", 
-      description: "Master the art of communicating with LLMs.", 
-      duration: "1 Week", 
-      difficulty: "Intermediate", 
-      category: "LLM & AI",
-      xpReward: 1500, 
-      order: 2,
-      certified: true,
-      externalLink: "https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/",
-      content: "Iterative prompting, summarizing, and reasoning.",
-      code: "response = openai.ChatCompletion.create(...)"
-    },
-    { 
-      id: '3', 
-      title: "System Design: High Scale", 
-      description: "Design distributed systems for millions of users.", 
-      duration: "4 Months", 
-      difficulty: "Advanced", 
-      category: "Architecture",
-      xpReward: 4000, 
-      order: 3,
-      certified: true,
-      externalLink: "https://www.educative.io/courses/grokking-modern-system-design-interview-for-engineers-managers",
-      content: "Load Balancing, Caching, Databases, and Microservices.",
-      code: "// Distributed Systems Hub"
-    },
-    { 
-      id: '4', 
-      title: "IBM Quantum Developer", 
-      description: "Programming the world's first quantum computers.", 
-      duration: "6 Months", 
-      difficulty: "Advanced", 
-      category: "Future Tech",
-      xpReward: 6000, 
-      order: 4,
-      certified: true,
-      externalLink: "https://www.ibm.com/training/certification/C0010300",
-      content: "Qiskit, Quantum Circuits, and Algorithms.",
-      code: "from qiskit import QuantumCircuit"
-    },
-    { 
-      id: '5', 
-      title: "Embedded Systems C/C++", 
-      description: "Build software for hardware and microcontrollers.", 
-      duration: "8 Months", 
-      difficulty: "Advanced", 
-      category: "Hardware",
-      xpReward: 3500, 
-      order: 5,
-      certified: true,
-      externalLink: "https://www.coursera.org/specializations/embedded-systems",
-      content: "RTOS, Interfacing, and Low-level optimization.",
-      code: "#include <avr/io.h>\nint main() { ... }"
-    },
-    { 
-      id: '6', 
-      title: "Google Go Professional", 
-      description: "Master high-performance systems with Golang.", 
-      duration: "3 Months", 
-      difficulty: "Intermediate", 
-      category: "Development",
-      xpReward: 2200, 
-      order: 6,
-      certified: true,
-      externalLink: "https://go.dev/learn/",
-      content: "Concurrency, Goroutines, and Scalable Services.",
-      code: "func main() { go worker() }"
-    },
-    { 
-      id: '7', 
-      title: "Apple iOS Development (Swift)", 
-      description: "Official path to building professional iOS apps.", 
-      duration: "8 Months", 
-      difficulty: "Intermediate", 
-      category: "Mobile",
-      xpReward: 3000, 
-      order: 7,
-      certified: true,
-      externalLink: "https://developer.apple.com/tutorials/app-dev-training",
-      content: "SwiftUI, ARKit, and iOS Architecture.",
-      code: "import SwiftUI\nstruct App: View { ... }"
-    },
-    { 
-      id: '8', 
-      title: "CNCF Kubernetes Admin (CKA)", 
-      description: "Official Linux Foundation K8s certification.", 
-      duration: "5 Months", 
-      difficulty: "Advanced", 
-      category: "DevOps",
-      xpReward: 4500, 
-      order: 8,
-      certified: true,
-      externalLink: "https://training.linuxfoundation.org/certification/certified-kubernetes-administrator-cka/",
-      content: "Cluster management, networking, and security.",
-      code: "kubectl create deployment ..."
-    },
-    { 
-      id: '9', 
-      title: "Oracle Java SE 17", 
-      description: "Advanced enterprise certification for Java devs.", 
-      duration: "10 Months", 
-      difficulty: "Advanced", 
-      category: "Development",
-      xpReward: 4000, 
-      order: 9,
-      certified: true,
-      externalLink: "https://education.oracle.com/java-se-17-developer/p824",
-      content: "Streams, Modules, and Enterprise Patterns.",
-      code: "public class Main { ... }"
-    },
-    { 
-      id: '10', 
-      title: "Google Cloud Data Engineer", 
-      description: "Design and build data processing systems on GCP.", 
-      duration: "6 Months", 
-      difficulty: "Advanced", 
-      category: "Cloud",
-      xpReward: 3800, 
-      order: 10,
-      certified: true,
-      externalLink: "https://cloud.google.com/learn/certification/data-engineer",
-      content: "BigQuery, Pub/Sub, and ML on Google Cloud.",
-      code: "// GCP Data Hub"
-    },
-    { 
-      id: '11', 
-      title: "DeepLearning.AI NLP", 
-      description: "Master Natural Language Processing technology.", 
-      duration: "4 Months", 
-      difficulty: "Advanced", 
-      category: "LLM & AI",
-      xpReward: 4200, 
-      order: 11,
-      certified: true,
-      externalLink: "https://www.coursera.org/specializations/natural-language-processing",
-      content: "Sequence models, Attention, and Transformers.",
-      code: "// NLP Mastery"
-    },
-    { 
-      id: '12', 
-      title: "Microsoft Azure AI Engineer", 
-      description: "Official Microsoft certification for AI on Azure.", 
-      duration: "5 Months", 
-      difficulty: "Intermediate", 
-      category: "Cloud",
-      xpReward: 3000, 
-      order: 12,
-      certified: true,
-      externalLink: "https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-engineer-associate/",
-      content: "Cognitive Services and Bot Framework.",
-      code: "// Azure AI Hub"
-    },
-    { 
-      id: '13', 
-      title: "Open Source Contributor", 
-      description: "Learn to contribute to world-class projects.", 
-      duration: "2 Months", 
-      difficulty: "Intermediate", 
-      category: "Community",
-      xpReward: 2000, 
-      order: 13,
-      certified: true,
-      externalLink: "https://opensource.guide/how-to-contribute/",
-      content: "Git, Pull Requests, and Documentation.",
-      code: "git push origin feature-branch"
-    },
-    { 
-      id: '14', 
-      title: "Meta Back-End Developer", 
-      description: "Master Python, APIs, and Databases with Meta.", 
-      duration: "8 Months", 
-      difficulty: "Intermediate", 
-      category: "Development",
-      xpReward: 2800, 
-      order: 14,
-      certified: true,
-      externalLink: "https://www.coursera.org/professional-certificates/meta-back-end-developer",
-      content: "Django, REST APIs, and System Design.",
-      code: "from rest_framework import viewsets"
-    },
-    { 
-      id: '15', 
-      title: "Google Cybersecurity", 
-      description: "Protect global organizations from cyber threats.", 
-      duration: "6 Months", 
-      difficulty: "Intermediate", 
-      category: "Security",
-      xpReward: 3200, 
-      order: 15,
-      certified: true,
-      externalLink: "https://www.coursera.org/professional-certificates/google-cybersecurity",
-      content: "Linux, SQL, Python, and SIEM tools.",
-      code: "// Security Operations"
-    },
-    { 
-      id: '16', 
-      title: "Meta Front-End Developer", 
-      description: "Master React and UI/UX with the creators.", 
-      duration: "7 Months", 
-      difficulty: "Beginner", 
-      category: "Development",
-      xpReward: 2000, 
-      order: 16,
-      certified: true,
-      externalLink: "https://www.coursera.org/professional-certificates/meta-front-end-developer",
-      content: "React, JS, and Figma Design.",
-      code: "// UI Hub"
-    },
-    { 
-      id: '17', 
-      title: "Google UX Design", 
-      description: "Foundational path to becoming a UX designer.", 
-      duration: "6 Months", 
-      difficulty: "Beginner", 
-      category: "Design",
-      xpReward: 1500, 
-      order: 17,
-      certified: true,
-      externalLink: "https://www.coursera.org/professional-certificates/google-ux-design",
-      content: "User Research, Wireframing, and Prototyping.",
-      code: "/* UX Lab */"
-    },
-    { 
-      id: '18', 
-      title: "AWS Cloud Practitioner", 
-      description: "Foundational cloud certification from Amazon.", 
-      duration: "2 Months", 
-      difficulty: "Beginner", 
-      category: "Cloud",
-      xpReward: 1200, 
-      order: 18,
-      certified: true,
-      externalLink: "https://aws.amazon.com/certification/certified-cloud-practitioner/",
-      content: "Global Infrastructure and Core Services.",
-      code: "aws s3 sync . s3://my-bucket"
-    },
-    { 
-      id: '19', 
-      title: "Meta iOS Developer", 
-      description: "Build iOS apps with Swift and SwiftUI.", 
-      duration: "8 Months", 
-      difficulty: "Intermediate", 
-      category: "Mobile",
-      xpReward: 2500, 
-      order: 19,
-      certified: true,
-      externalLink: "https://www.coursera.org/professional-certificates/meta-ios-developer",
-      content: "Mobile UX and Swift programming.",
-      code: "// iOS Hub"
-    },
-    { 
-      id: '20', 
-      title: "IBM Full Stack Cloud Dev", 
-      description: "The complete cloud engineering path.", 
-      duration: "12 Months", 
-      difficulty: "Intermediate", 
-      category: "Development",
-      xpReward: 4500, 
-      order: 20,
-      certified: true,
-      externalLink: "https://www.coursera.org/professional-certificates/ibm-full-stack-cloud-developer",
-      content: "Node.js, Docker, K8s, and Python.",
-      code: "// Full Stack Hub"
-    },
-    { 
-      id: '21', 
-      title: "Unity Game Developer", 
-      description: "Professional path to Unity game development.", 
-      duration: "6 Months", 
-      difficulty: "Intermediate", 
-      category: "Game Dev",
-      xpReward: 2500, 
-      order: 21,
-      certified: true,
-      externalLink: "https://learn.unity.com/pathway/unity-certified-user-programmer",
-      content: "C# Scripting and Unity Game Engine.",
-      code: "// Game Hub"
-    },
-    { 
-      id: '22', 
-      title: "Google Project Management", 
-      description: "Lead complex tech projects with confidence.", 
-      duration: "6 Months", 
-      difficulty: "Beginner", 
-      category: "Business",
-      xpReward: 1500, 
-      order: 22,
-      certified: true,
-      externalLink: "https://www.coursera.org/professional-certificates/google-project-management",
-      content: "Agile, Scrum, and Waterfall methodologies.",
-      code: "// Project Hub"
-    }
-  ],
-  projects: [
-    { id: '1', title: "AI Snippet Manager", category: "Intermediate", description: "Build a tool that uses AI to categorize snippets.", tags: ["Next.js", "Gemini API"], xpReward: 800 },
-    { id: '2', title: "Blockchain Ledger", category: "Advanced", description: "Create a simple immutable ledger in Go or Rust.", tags: ["Go", "Cryptography"], xpReward: 1200 },
-    { id: '3', title: "SaaS Dashboard UI", category: "Beginner", description: "A high-performance dashboard with dark mode.", tags: ["React", "Framer Motion"], xpReward: 400 },
-  ],
-  snippets: [
-    { id: 1, title: 'React Modal Hook', code: 'const useModal = () => { ... }', language: 'TypeScript' },
-    { id: 2, title: 'Debounce Function', code: 'function debounce(fn, ms) { ... }', language: 'JavaScript' },
+    { id: '1', title: "Generative AI with LLMs", xpReward: 5000, difficulty: "Advanced", category: "Artificial Intelligence", duration: "3 Weeks", description: "Master Transformer architecture, RLHF, and prompt engineering.", order: 1, externalLink: "https://www.coursera.org/learn/generative-ai-with-llms" },
+    { id: '2', title: "System Design: High Scale", xpReward: 4000, difficulty: "Advanced", category: "Architecture", duration: "4 Months", description: "Design global-scale systems with load balancing and microservices.", order: 2, externalLink: "https://www.coursera.org/specializations/software-design-architecture" },
+    { id: '3', title: "Kubernetes Admin (CKA)", xpReward: 4500, difficulty: "Advanced", category: "DevOps", duration: "5 Months", description: "Advanced cluster management and cloud-native security.", order: 3, externalLink: "https://www.coursera.org/specializations/architecting-google-kubernetes-engine" },
+    { id: '4', title: "Quantum Developer", xpReward: 6000, difficulty: "Advanced", category: "Future Tech", duration: "6 Months", description: "Build the future with Qiskit and quantum algorithms.", order: 4, externalLink: "https://www.coursera.org/learn/quantum-computing-algorithms" },
+    { id: '5', title: "Advanced Rust Orchestration", xpReward: 5500, difficulty: "Advanced", category: "Systems Engineering", duration: "4 Weeks", description: "Master safe concurrency and zero-cost abstractions with Rust.", order: 5, externalLink: "https://www.coursera.org/specializations/rust-programming" },
+    { id: '6', title: "Full-Stack Edge Deployment", xpReward: 4800, difficulty: "Advanced", category: "Cloud Infrastructure", duration: "3 Weeks", description: "Deploy global-scale apps with Vercel Edge and Supabase.", order: 6, externalLink: "https://www.coursera.org/professional-certificates/meta-front-end-developer" }
   ],
   leaderboard: [
-    { name: "Sarah Connor", xp: 45000, level: "Elite", streak: 42 },
-    { name: "Roshan Teja", xp: 24500, level: "Advanced", streak: 15 },
-    { name: "Linus Torvalds", xp: 99999, level: "God Mode", streak: 1000 },
-    { name: "Ada Lovelace", xp: 12000, level: "Intermediate", streak: 5 },
-    { name: "Alan Turing", xp: 8500, level: "Intermediate", streak: 8 },
+    { name: "Sarah Connor", xp: 45000, karma: 340, badges: { oracleLevel: 2 }, level: "Elite", streak: 42, region: "Americas", country: "US" },
+    { name: "Roshan Teja", xp: 24500, karma: 150, badges: { architectLevel: 1 }, level: "Advanced", streak: 15, region: "Asia", country: "IN" },
+    { name: "Linus Torvalds", xp: 99999, karma: 890, badges: { sageLevel: 3, oracleLevel: 3 }, level: "God Mode", streak: 1000, region: "Europe", country: "FI" },
+    { name: "Ada Lovelace", xp: 12000, karma: 420, badges: { architectLevel: 3 }, level: "Intermediate", streak: 5, region: "Europe", country: "UK" },
+    { name: "Alan Turing", xp: 8500, karma: 110, badges: {}, level: "Intermediate", streak: 8, region: "Europe", country: "UK" },
+    { name: "Yukihiro Matsumoto", xp: 32000, karma: 560, badges: { sageLevel: 2 }, level: "Elite", streak: 200, region: "Asia", country: "JP" },
+    { name: "Guido van Rossum", xp: 41000, karma: 780, badges: { sageLevel: 3 }, level: "Elite", streak: 150, region: "Americas", country: "US" },
   ],
   academy: [
     {
@@ -358,74 +50,56 @@ const INITIAL_DATA = {
       category: 'Frontend',
       title: 'HTML5 Modern Standard',
       chapters: [
-        { id: 'html-intro', title: 'HTML Introduction', desc: "HTML is the standard markup language for Web pages. With HTML you can create your own Website.", fact: "HTML stands for Hyper Text Markup Language.", code: "<h1>Hello World</h1>" },
-        { id: 'html-elements', title: 'HTML Elements', desc: "An HTML element is defined by a start tag, some content, and an end tag.", fact: "The element is everything from the start tag to the end tag.", code: "<p>This is a paragraph.</p>" },
-        { id: 'html-attributes', title: 'HTML Attributes', desc: "Attributes provide additional information about elements.", fact: "Attributes are always specified in the start tag.", code: "<a href='https://w3schools.com'>Visit W3Schools</a>" },
-        { id: 'html-headings', title: 'HTML Headings', desc: "HTML headings are defined with the <h1> to <h6> tags.", fact: "Search engines use headings to index the structure of your web pages.", code: "<h1>Heading 1</h1>\n<h2>Heading 2</h2>" },
-        { id: 'html-paragraphs', title: 'HTML Paragraphs', desc: "The HTML <p> element defines a paragraph.", fact: "A paragraph always starts on a new line.", code: "<p>This is a paragraph.</p>\n<p>This is another paragraph.</p>" },
-        { id: 'html-styles', title: 'HTML Styles', desc: "The HTML style attribute is used to add styles to an element.", fact: "Setting the style of an HTML element, can be done with the style attribute.", code: "<p style='color:red;'>I am red</p>\n<p style='color:blue;'>I am blue</p>" },
-        { id: 'html-formatting', title: 'HTML Formatting', desc: "HTML contains several elements for defining text with a special meaning.", fact: "Formatting elements were designed to display special types of text.", code: "<b>This text is bold</b>\n<i>This text is italic</i>" },
-        { id: 'html-css', title: 'HTML CSS', desc: "CSS stands for Cascading Style Sheets. CSS saves a lot of work. It can control the layout of multiple web pages all at once.", fact: "CSS can be added to HTML elements in 3 ways: Inline, Internal, External.", code: "<style>\nbody {background-color: powderblue;}\nh1   {color: blue;}\np    {color: red;}\n</style>" }
-      ]
-    },
-    {
-      id: 'css',
-      name: 'CSS3',
-      category: 'Frontend',
-      title: 'CSS Styling Mastery',
-      chapters: [
-        { id: 'css-intro', title: 'CSS Introduction', desc: "CSS is the language we use to style a Web page.", fact: "CSS stands for Cascading Style Sheets.", code: "body {\n  background-color: lightblue;\n}\nh1 {\n  color: white;\n  text-align: center;\n}" },
-        { id: 'css-syntax', title: 'CSS Syntax', desc: "A CSS rule-set consists of a selector and a declaration block.", fact: "The selector points to the HTML element you want to style.", code: "p {\n  color: red;\n  text-align: center;\n}" },
-        { id: 'css-selectors', title: 'CSS Selectors', desc: "CSS selectors are used to 'find' (or select) the HTML elements you want to style.", fact: "We can divide CSS selectors into five categories.", code: "#para1 {\n  text-align: center;\n  color: red;\n}\n.center {\n  text-align: center;\n  color: blue;\n}" },
-        { id: 'css-colors', title: 'CSS Colors', desc: "Colors are specified using predefined color names, or RGB, HEX, HSL, RGBA, HSLA values.", fact: "HTML supports 140 standard color names.", code: "<h1 style='background-color:DodgerBlue;'>Hello World</h1>\n<p style='background-color:Tomato;'>Lorem ipsum...</p>" },
-        { id: 'css-backgrounds', title: 'CSS Backgrounds', desc: "The CSS background properties are used to add background effects for elements.", fact: "You can set backgrounds for individual elements or the entire page.", code: "body {\n  background-image: url('img_tree.png');\n  background-repeat: no-repeat;\n}" },
-        { id: 'css-boxmodel', title: 'CSS Box Model', desc: "All HTML elements can be considered as boxes. In CSS, the term 'box model' is used when talking about design and layout.", fact: "The CSS box model is essentially a box that wraps around every HTML element.", code: "div {\n  width: 300px;\n  border: 15px solid green;\n  padding: 50px;\n  margin: 20px;\n}" }
+        { id: 'html-intro', title: 'HTML Introduction', desc: "Standard markup language for Web pages.", fact: "HTML stands for Hyper Text Markup Language.", code: "<h1>Hello World</h1>" }
       ]
     },
     {
       id: 'javascript',
       name: 'JavaScript',
       category: 'Frontend',
-      title: 'JavaScript ES6+ Mastery',
+      title: 'JavaScript ES6+',
       chapters: [
-        { id: 'js-intro', title: 'JS Introduction', desc: "JavaScript is the world's most popular programming language.", fact: "JavaScript is the programming language of the Web.", code: "console.log('Hello World');" },
-        { id: 'js-variables', title: 'JS Variables', desc: "Variables are containers for storing data.", fact: "In JS, we use var, let, and const to declare variables.", code: "let x = 5;\nlet y = 6;\nlet z = x + y;\nconsole.log(z);" },
-        { id: 'js-let', title: 'JS Let', desc: "The let keyword was introduced in ES6 (2015).", fact: "Variables defined with let cannot be Redeclared.", code: "let x = 'John Doe';\n// let x = 0; // Error" },
-        { id: 'js-const', title: 'JS Const', desc: "The const keyword was introduced in ES6 (2015).", fact: "Variables defined with const cannot be Redeclared or Reassigned.", code: "const PI = 3.141592653589793;\n// PI = 3.14; // Error" },
-        { id: 'js-operators', title: 'JS Operators', desc: "JavaScript operators are used to assign values, compare values, perform arithmetic operations, and more.", fact: "Arithmetic operators are used to perform arithmetic on numbers.", code: "let x = 5;\nlet y = 2;\nlet z = x + y;\nconsole.log(z);" },
-        { id: 'js-datatypes', title: 'JS Data Types', desc: "JavaScript variables can hold different data types: numbers, strings, objects and more.", fact: "JavaScript has dynamic types.", code: "let length = 16;          // Number\nlet lastName = 'Johnson'; // String\nlet x = {firstName:'John', lastName:'Doe'}; // Object" },
-        { id: 'js-functions', title: 'JS Functions', desc: "A JavaScript function is a block of code designed to perform a particular task.", fact: "A JavaScript function is executed when 'something' invokes it (calls it).", code: "function myFunction(p1, p2) {\n  return p1 * p2;\n}\nconsole.log(myFunction(4, 3));" }
-      ]
-    },
-    {
-      id: 'python',
-      name: 'Python',
-      category: 'Backend',
-      title: 'Python for Data & AI',
-      chapters: [
-        { id: 'py-intro', title: 'Python Syntax', desc: "Python syntax can be executed by writing directly in the Command Line.", fact: "Python uses indentation to indicate a block of code.", code: "print('Hello, World!')" },
-        { id: 'py-comments', title: 'Python Comments', desc: "Comments can be used to explain Python code.", fact: "Comments start with a #, and Python will ignore them.", code: "#This is a comment\nprint('Hello, World!')" },
-        { id: 'py-variables', title: 'Python Variables', desc: "Variables are containers for storing data values.", fact: "Python has no command for declaring a variable.", code: "x = 5\ny = 'John'\nprint(x)\nprint(y)" },
-        { id: 'py-datatypes', title: 'Python Data Types', desc: "Variables can store data of different types, and different types can do different things.", fact: "Python has many built-in data types.", code: "x = 5    # int\ny = 'Hello' # str\nz = 20.5 # float" },
-        { id: 'py-numbers', title: 'Python Numbers', desc: "There are three numeric types in Python: int, float, complex.", fact: "Variables of numeric types are created when you assign a value to them.", code: "x = 1    # int\ny = 2.8  # float\nz = 1j   # complex" }
-      ]
-    },
-    {
-      id: 'sql',
-      name: 'SQL',
-      category: 'Database',
-      title: 'SQL Database Mastery',
-      chapters: [
-        { id: 'sql-intro', title: 'SQL Introduction', desc: "SQL is a standard language for accessing and manipulating databases.", fact: "SQL stands for Structured Query Language.", code: "-- SQL is case insensitive\nSELECT * FROM Customers;" },
-        { id: 'sql-select', title: 'SQL SELECT', desc: "The SELECT statement is used to select data from a database.", fact: "The data returned is stored in a result table, called the result-set.", code: "SELECT CustomerName, City FROM Customers;" },
-        { id: 'sql-distinct', title: 'SQL DISTINCT', desc: "The SELECT DISTINCT statement is used to return only distinct (different) values.", fact: "Inside a table, a column often contains many duplicate values.", code: "SELECT DISTINCT Country FROM Customers;" },
-        { id: 'sql-where', title: 'SQL WHERE', desc: "The WHERE clause is used to filter records.", fact: "The WHERE clause is used to extract only those records that fulfill a specified condition.", code: "SELECT * FROM Customers\nWHERE Country='Mexico';" }
+        { id: 'js-intro', title: 'JS Introduction', desc: "World's most popular language.", fact: "JavaScript is the language of the Web.", code: "console.log('Hello World');" }
       ]
     }
-  ]
+  ],
+  reviews: [
+    {
+      id: 'rev1',
+      challengeId: '1',
+      submitterId: 'Ada Lovelace',
+      reviewerId: 'Roshan Teja',
+      status: 'PENDING',
+      feedbackText: '',
+      codeSnippet: 'import { pipeline } from "transformers";\n\nconst generator = pipeline("text-generation", model="gpt2");\nconsole.log(generator("Hello, I am a language model,")[0].generated_text);',
+      helpfulScore: 0,
+      createdAt: new Date().toISOString()
+    }
+  ],
+  mentorships: [],
+  echoHints: [
+    {
+      id: 'echo1',
+      challengeId: '1',
+      authorId: 'Sarah Connor',
+      belt: 'YELLOW',
+      content: 'Make sure to understand how RLHF maps human preferences to a reward model before tuning the base model.',
+      netUpvotes: 14,
+      isHidden: false
+    },
+    {
+      id: 'echo2',
+      challengeId: '1',
+      authorId: 'Linus Torvalds',
+      belt: 'YELLOW',
+      content: 'Transformers parallelize well. Don\'t get stuck thinking of them as sequential RNNs.',
+      netUpvotes: 8,
+      isHidden: false
+    }
+  ],
+  squads: []
 };
 
-// Database Service
 export const db = {
   read: () => {
     if (!fs.existsSync(DB_PATH)) {
@@ -434,23 +108,15 @@ export const db = {
     }
     const existing = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
     
-    // Smart Migration: ensure lessons have new content while preserving user progress
-    const mergedLessons = INITIAL_DATA.lessons.map(initial => {
-      const exist = (existing.lessons || []).find((l: any) => l.id === initial.id);
-      return { ...initial, ...exist, content: initial.content, code: initial.code }; // Force update content/code
-    });
-
-    // Smart Migration: ensure academy has new chapter structure
-    const hasChapters = existing.academy?.every((item: any) => item.chapters && item.chapters.length > 0);
-    const mergedAcademy = (hasChapters && existing.academy?.length >= INITIAL_DATA.academy.length) 
-      ? existing.academy 
-      : INITIAL_DATA.academy;
-
-    return { 
-      ...INITIAL_DATA, 
-      ...existing, 
-      lessons: mergedLessons,
-      academy: mergedAcademy
+    return {
+      ...INITIAL_DATA,
+      ...existing,
+      user: { ...INITIAL_DATA.user, ...existing.user },
+      leaderboard: existing.leaderboard || INITIAL_DATA.leaderboard,
+      reviews: existing.reviews || INITIAL_DATA.reviews,
+      mentorships: existing.mentorships || INITIAL_DATA.mentorships,
+      echoHints: existing.echoHints || INITIAL_DATA.echoHints,
+      squads: existing.squads || INITIAL_DATA.squads
     };
   },
   
@@ -465,9 +131,30 @@ export const db = {
     return data.user;
   },
 
-  getLessons: () => db.read().lessons,
-  getProjects: () => db.read().projects,
-  getSnippets: () => db.read().snippets,
-  getAcademy: () => db.read().academy,
+  addKarma: (amount: number) => {
+    const data = db.read();
+    data.user.karma = (data.user.karma || 0) + amount;
+    db.write(data);
+    return data.user.karma;
+  },
+
+  getReviews: (challengeId?: string) => {
+    const reviews = db.read().reviews || [];
+    return challengeId ? reviews.filter((r: any) => r.challenge_id === challengeId) : reviews;
+  },
+  
+  addReview: (review: any) => {
+    const data = db.read();
+    data.reviews = [...(data.reviews || []), { id: Date.now().toString(), ...review }];
+    db.write(data);
+    return data.reviews;
+  },
+
   getLeaderboard: () => db.read().leaderboard,
+  getLessons: () => db.read().lessons,
+  getLesson: (id: string) => {
+    const lessons = db.read().lessons || [];
+    return lessons.find((l: any) => l.id === id);
+  },
+  getAcademy: () => db.read().academy,
 };

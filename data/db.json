@@ -2,7 +2,7 @@
   "user": {
     "name": "Roshan Teja",
     "email": "roshan@devgrowth.com",
-    "xp": 26970,
+    "xp": 26985,
     "streak": 15,
     "skillLevel": "Advanced",
     "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Roshan",
@@ -35,7 +35,7 @@
       "xpReward": 200,
       "order": 1,
       "certified": true,
-      "externalLink": "https://www.deeplearning.ai/courses/generative-ai-with-large-language-models/",
+      "externalLink": "https://www.coursera.org/learn/generative-ai-with-llms",
       "content": "Transformer architecture, RLHF, and fine-tuning.",
       "code": "from transformers import AutoModelForCausalLM"
     },
@@ -49,7 +49,7 @@
       "xpReward": 150,
       "order": 2,
       "certified": true,
-      "externalLink": "https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/",
+      "externalLink": "https://www.coursera.org/learn/prompt-engineering",
       "content": "Iterative prompting, summarizing, and reasoning.",
       "code": "response = openai.ChatCompletion.create(...)"
     },
@@ -63,7 +63,7 @@
       "xpReward": 500,
       "order": 3,
       "certified": true,
-      "externalLink": "https://www.educative.io/courses/grokking-modern-system-design-interview-for-engineers-managers",
+      "externalLink": "https://www.coursera.org/specializations/software-design-architecture",
       "content": "Load Balancing, Caching, Databases, and Microservices.",
       "code": "// Distributed Systems Hub"
     },
@@ -77,7 +77,7 @@
       "xpReward": 250,
       "order": 4,
       "certified": true,
-      "externalLink": "https://www.ibm.com/training/certification/C0010300",
+      "externalLink": "https://www.coursera.org/learn/quantum-computing-algorithms",
       "content": "Qiskit, Quantum Circuits, and Algorithms.",
       "code": "from qiskit import QuantumCircuit"
     },
@@ -105,7 +105,7 @@
       "xpReward": 2200,
       "order": 6,
       "certified": true,
-      "externalLink": "https://go.dev/learn/",
+      "externalLink": "https://www.coursera.org/specializations/google-golang",
       "content": "Concurrency, Goroutines, and Scalable Services.",
       "code": "func main() { go worker() }"
     },
@@ -119,7 +119,7 @@
       "xpReward": 3000,
       "order": 7,
       "certified": true,
-      "externalLink": "https://developer.apple.com/tutorials/app-dev-training",
+      "externalLink": "https://www.coursera.org/specializations/app-development",
       "content": "SwiftUI, ARKit, and iOS Architecture.",
       "code": "import SwiftUI\nstruct App: View { ... }"
     },
@@ -133,7 +133,7 @@
       "xpReward": 4500,
       "order": 8,
       "certified": true,
-      "externalLink": "https://training.linuxfoundation.org/certification/certified-kubernetes-administrator-cka/",
+      "externalLink": "https://www.coursera.org/specializations/architecting-google-kubernetes-engine",
       "content": "Cluster management, networking, and security.",
       "code": "kubectl create deployment ..."
     },
@@ -147,7 +147,7 @@
       "xpReward": 4000,
       "order": 9,
       "certified": true,
-      "externalLink": "https://education.oracle.com/java-se-17-developer/p824",
+      "externalLink": "https://www.coursera.org/specializations/java-programming",
       "content": "Streams, Modules, and Enterprise Patterns.",
       "code": "public class Main { ... }"
     },
@@ -161,7 +161,7 @@
       "xpReward": 3800,
       "order": 10,
       "certified": true,
-      "externalLink": "https://cloud.google.com/learn/certification/data-engineer",
+      "externalLink": "https://www.coursera.org/professional-certificates/google-cloud-data-engineering",
       "content": "BigQuery, Pub/Sub, and ML on Google Cloud.",
       "code": "// GCP Data Hub"
     },
@@ -189,7 +189,7 @@
       "xpReward": 3000,
       "order": 12,
       "certified": true,
-      "externalLink": "https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-engineer-associate/",
+      "externalLink": "https://www.coursera.org/professional-certificates/azure-data-scientist",
       "content": "Cognitive Services and Bot Framework.",
       "code": "// Azure AI Hub"
     },
@@ -203,7 +203,7 @@
       "xpReward": 2000,
       "order": 13,
       "certified": true,
-      "externalLink": "https://opensource.guide/how-to-contribute/",
+      "externalLink": "https://www.coursera.org/learn/open-source-software-development-methods",
       "content": "Git, Pull Requests, and Documentation.",
       "code": "git push origin feature-branch"
     },
@@ -273,7 +273,7 @@
       "xpReward": 1200,
       "order": 18,
       "certified": true,
-      "externalLink": "https://aws.amazon.com/certification/certified-cloud-practitioner/",
+      "externalLink": "https://www.coursera.org/professional-certificates/aws-cloud-technology-consultant",
       "content": "Global Infrastructure and Core Services.",
       "code": "aws s3 sync . s3://my-bucket"
     },
@@ -315,7 +315,7 @@
       "xpReward": 2500,
       "order": 21,
       "certified": true,
-      "externalLink": "https://learn.unity.com/pathway/unity-certified-user-programmer",
+      "externalLink": "https://www.coursera.org/specializations/programming-unity-game-development",
       "content": "C# Scripting and Unity Game Engine.",
       "code": "// Game Hub"
     },

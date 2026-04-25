@@ -10,8 +10,10 @@ import {
   Play, 
   Lock,
   ArrowRight,
-  Search
+  Search,
+  Users
 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function LessonsPage() {
   const [lessons, setLessons] = useState<any[]>([]);
@@ -50,8 +52,33 @@ export default function LessonsPage() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', paddingBottom: '80px' }}>
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '24px', flexWrap: 'wrap' }}>
         <div>
-          <h1 style={{ fontSize: '32px', fontWeight: 800, marginBottom: '8px' }}>Certification Hub</h1>
-          <p style={{ color: 'var(--text-muted)' }}>Follow professional roadmaps to earn world-class industry credentials.</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '8px' }}>
+            <h1 style={{ fontSize: '32px', fontWeight: 800, margin: 0 }}>Certification Hub</h1>
+            <a 
+              href="https://www.coursera.org" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '8px', 
+                padding: '6px 12px', 
+                background: 'rgba(0, 86, 210, 0.1)', 
+                border: '1px solid rgba(0, 86, 210, 0.2)', 
+                borderRadius: '8px',
+                color: '#4489ff',
+                fontSize: '12px',
+                fontWeight: 700,
+                textDecoration: 'none',
+                transition: 'all 0.2s'
+              }}
+              className="hover-glow"
+            >
+              <img src="https://upload.wikimedia.org/wikipedia/commons/9/97/Coursera-Logo_600x600.svg" alt="" style={{ width: '16px' }} />
+              Partnered with Coursera
+            </a>
+          </div>
+          <p style={{ color: 'var(--text-muted)' }}>Follow professional roadmaps to earn world-class industry credentials from top universities and tech giants.</p>
         </div>
         
         <div style={{ position: 'relative', width: '100%', maxWidth: '400px' }}>
@@ -112,6 +139,13 @@ export default function LessonsPage() {
         <section key={category}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
             <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--primary)' }}>{category}</h2>
+            
+            {/* Ghost Squad Indicator */}
+            <div title="Active Peers in this Category" style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.05)', padding: '4px 12px', borderRadius: '12px', cursor: 'pointer', border: '1px solid var(--card-border)' }} onClick={() => toast.success("Forming Ghost Squad with active peers...", { icon: <Users size={16} /> })}>
+              <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 10px #10b981', animation: 'pulse 2s infinite' }} />
+              <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }}>{catLessons.length * 2} Ghosts Active</span>
+            </div>
+
             <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, var(--card-border) 0%, transparent 100%)' }} />
           </div>
 
@@ -167,31 +201,62 @@ export default function LessonsPage() {
                     <CheckCircle2 size={14} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
                     {lesson.duration}
                   </div>
-                  <a 
-                    href={lesson.externalLink} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    style={{ textDecoration: 'none' }}
-                  >
-                    <button style={{ 
-                      background: 'var(--primary)',
-                      color: 'white',
-                      border: 'none',
-                      padding: '8px 20px',
-                      borderRadius: '8px',
-                      fontSize: '14px',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      marginLeft: 'auto',
-                      boxShadow: '0 4px 12px rgba(59, 130, 246, 0.2)'
-                    }}>
-                      Start Track
-                      <Play size={12} fill="currentColor" />
-                    </button>
-                  </a>
+                  {lesson.externalLink ? (
+                    <a 
+                      href={lesson.externalLink} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      style={{ textDecoration: 'none' }}
+                    >
+                      <button style={{ 
+                        background: lesson.externalLink.includes('coursera.org') ? '#0056D2' : 'var(--primary)',
+                        color: 'white',
+                        border: 'none',
+                        padding: '8px 20px',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        marginLeft: 'auto',
+                        boxShadow: lesson.externalLink.includes('coursera.org') 
+                          ? '0 4px 12px rgba(0, 86, 210, 0.3)' 
+                          : '0 4px 12px rgba(59, 130, 246, 0.2)'
+                      }}>
+                        {lesson.externalLink.includes('coursera.org') && (
+                          <img src="https://upload.wikimedia.org/wikipedia/commons/9/97/Coursera-Logo_600x600.svg" alt="" style={{ width: '14px', filter: 'brightness(0) invert(1)' }} />
+                        )}
+                        {lesson.externalLink.includes('coursera.org') ? 'View on Coursera' : 'Start Track'}
+                        <Play size={12} fill="currentColor" />
+                      </button>
+                    </a>
+                  ) : (
+                    <Link 
+                      href={`/lessons/${lesson.id}`} 
+                      style={{ textDecoration: 'none' }}
+                    >
+                      <button style={{ 
+                        background: 'var(--primary)',
+                        color: 'white',
+                        border: 'none',
+                        padding: '8px 20px',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        marginLeft: 'auto',
+                        boxShadow: '0 4px 12px rgba(59, 130, 246, 0.2)'
+                      }}>
+                        Start Track
+                        <Play size={12} fill="currentColor" />
+                      </button>
+                    </Link>
+                  )}
                 </div>
               </motion.div>
             ))}

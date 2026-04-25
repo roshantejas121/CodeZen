@@ -23,6 +23,7 @@ const menuItems = [
   { icon: BookOpen, label: "Certifications", href: "/lessons" },
   { icon: Code2, label: "Project Lab", href: "/projects" },
   { icon: FaGithub, label: "GitHub Hub", href: "/github" },
+  { icon: Zap, label: "DOJO Workouts", href: "/dojo" },
   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
 ];
 
