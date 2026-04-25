@@ -88,6 +88,7 @@ export function LiveEditor({
     setRunning(true);
     setOutput("");
     
+    // 1. Handle HTML/CSS (Live Preview)
     if (language === 'html' || language === 'css') {
       setSrcDoc(code);
       toast.success("Live Preview updated! +5 XP");
@@ -96,6 +97,71 @@ export function LiveEditor({
       return;
     }
 
+    // 2. Handle JavaScript Locally
+    if (language === 'javascript') {
+      let logs: string[] = [];
+      const customConsole = {
+        log: (...args: any[]) => {
+          logs.push(args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)).join(' '));
+        },
+        error: (...args: any[]) => {
+          logs.push(`Error: ${args.join(' ')}`);
+        },
+        warn: (...args: any[]) => {
+          logs.push(`Warning: ${args.join(' ')}`);
+        }
+      };
+
+      try {
+        const runCode = new Function('console', code);
+        runCode(customConsole);
+        setOutput(logs.join('\n') || "Execution finished with no output.");
+        toast.success("Code executed! +5 XP");
+        updateXP();
+      } catch (err: any) {
+        setOutput(`Runtime Error: ${err.message}`);
+        toast.error("Runtime error detected");
+      }
+      setRunning(false);
+      return;
+    }
+
+    // 3. Handle Python Locally (Pyodide WASM)
+    if (language === 'python') {
+      try {
+        setOutput("Initializing Python Engine...");
+        // @ts-ignore
+        if (!window.pyodide) {
+          // @ts-ignore
+          window.pyodide = await loadPyodide({
+            indexURL: "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/"
+          });
+        }
+        // @ts-ignore
+        const pyodide = window.pyodide;
+        
+        // Capture stdout
+        pyodide.runPython(`
+import sys
+import io
+sys.stdout = io.StringIO()
+        `);
+        
+        await pyodide.runPythonAsync(code);
+        const stdout = pyodide.runPython("sys.stdout.getvalue()");
+        
+        setOutput(stdout || "Execution finished with no output.");
+        toast.success("Python executed! +5 XP");
+        updateXP();
+      } catch (err: any) {
+        setOutput(`Python Error: ${err.message}`);
+        toast.error("Python runtime error");
+      }
+      setRunning(false);
+      return;
+    }
+
+    // 4. Handle Other Languages via API (SQL, etc.)
     try {
       const res = await fetch('/api/compiler', {
         method: 'POST',
@@ -106,8 +172,9 @@ export function LiveEditor({
       
       if (data.output || data.stdout || data.stderr) {
         setOutput(data.output || data.stdout || data.stderr);
-        if (data.stderr) toast.error("Runtime error detected");
-        else {
+        if (data.stderr || (data.output && data.output.includes("Engine Error"))) {
+          toast.error("Execution error detected");
+        } else {
           toast.success("Code executed! +5 XP");
           updateXP();
         }

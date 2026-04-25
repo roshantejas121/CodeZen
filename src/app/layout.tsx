@@ -18,6 +18,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+      </head>
       <body style={{ margin: 0 }}>
         <Toaster position="top-right" richColors />
         <CommandPalette />
