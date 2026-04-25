@@ -2,8 +2,15 @@
 
 **CodeZen** is a high-performance, professional-grade platform designed to accelerate technical mastery. It merges the structured curriculum of W3Schools with the high-intensity execution environment of LeetCode, all powered by an integrated AI Technical Audit system.
 
+![Theme](https://img.shields.io/badge/Theme-Learning%20%26%20Developer%20Productivity-ff4757?style=for-the-badge)
 ![Project Status](https://img.shields.io/badge/Status-Production--Ready-10b981?style=for-the-badge)
 ![Tech Stack](https://img.shields.io/badge/Stack-Next.js%2014%20|%20TypeScript%20|%20Tailwind-3b82f6?style=for-the-badge)
+
+## 🎯 The Challenge
+
+> **Problem Statement**: Constant context switching between coding, debugging, and scattered tools breaks developer flow, reducing productivity and effective learning.
+
+**CodeZen** solves this by providing a **Unified Engineering Ecosystem**. Instead of jumping between tabs for documentation, compilers, and GitHub, developers can stay in a "Deep Flow" state where learning and execution happen in a single, high-fidelity workspace.
 
 ## 🌟 Core Pillars
 
