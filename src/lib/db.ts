@@ -97,7 +97,12 @@ const INITIAL_DATA = {
       isHidden: false
     }
   ],
-  squads: []
+  squads: [],
+  projects: [
+    { id: 'p1', title: 'AI Snippet Manager', xpReward: 800, difficulty: 'Intermediate', category: 'AI Tools', description: 'Build a tool that auto-categorizes code snippets using LLMs.' },
+    { id: 'p2', title: 'High-Performance Rust Proxy', xpReward: 1200, difficulty: 'Advanced', category: 'Systems', description: 'Develop a zero-copy TCP proxy with Rust and Tokio.' },
+    { id: 'p3', title: 'Web3 Auth Provider', xpReward: 1000, difficulty: 'Intermediate', category: 'Blockchain', description: 'Implement a secure authentication layer using Ethereum wallets.' }
+  ]
 };
 
 export const db = {
@@ -116,45 +121,47 @@ export const db = {
       reviews: existing.reviews || INITIAL_DATA.reviews,
       mentorships: existing.mentorships || INITIAL_DATA.mentorships,
       echoHints: existing.echoHints || INITIAL_DATA.echoHints,
-      squads: existing.squads || INITIAL_DATA.squads
-    };
-  },
-  
-  write: (data: any) => {
-    fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
-  },
+    squads: existing.squads || INITIAL_DATA.squads,
+    projects: existing.projects || INITIAL_DATA.projects
+  };
+},
 
-  updateUser: (updates: any) => {
-    const data = db.read();
-    data.user = { ...data.user, ...updates };
-    db.write(data);
-    return data.user;
-  },
+write: (data: any) => {
+  fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+},
 
-  addKarma: (amount: number) => {
-    const data = db.read();
-    data.user.karma = (data.user.karma || 0) + amount;
-    db.write(data);
-    return data.user.karma;
-  },
+updateUser: (updates: any) => {
+  const data = db.read();
+  data.user = { ...data.user, ...updates };
+  db.write(data);
+  return data.user;
+},
 
-  getReviews: (challengeId?: string) => {
-    const reviews = db.read().reviews || [];
-    return challengeId ? reviews.filter((r: any) => r.challenge_id === challengeId) : reviews;
-  },
-  
-  addReview: (review: any) => {
-    const data = db.read();
-    data.reviews = [...(data.reviews || []), { id: Date.now().toString(), ...review }];
-    db.write(data);
-    return data.reviews;
-  },
+addKarma: (amount: number) => {
+  const data = db.read();
+  data.user.karma = (data.user.karma || 0) + amount;
+  db.write(data);
+  return data.user.karma;
+},
 
-  getLeaderboard: () => db.read().leaderboard,
-  getLessons: () => db.read().lessons,
-  getLesson: (id: string) => {
-    const lessons = db.read().lessons || [];
-    return lessons.find((l: any) => l.id === id);
-  },
-  getAcademy: () => db.read().academy,
+getReviews: (challengeId?: string) => {
+  const reviews = db.read().reviews || [];
+  return challengeId ? reviews.filter((r: any) => r.challenge_id === challengeId) : reviews;
+},
+
+addReview: (review: any) => {
+  const data = db.read();
+  data.reviews = [...(data.reviews || []), { id: Date.now().toString(), ...review }];
+  db.write(data);
+  return data.reviews;
+},
+
+getLeaderboard: () => db.read().leaderboard,
+getLessons: () => db.read().lessons,
+getLesson: (id: string) => {
+  const lessons = db.read().lessons || [];
+  return lessons.find((l: any) => l.id === id);
+},
+getAcademy: () => db.read().academy,
+getProjects: () => db.read().projects || [],
 };

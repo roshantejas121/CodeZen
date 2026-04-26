@@ -14,12 +14,14 @@ import { FaGithub } from "react-icons/fa";
 import { toast } from "sonner";
 import Link from "next/link";
 
-export default function ProjectDetailsPage({ params }: { params: { id: string } }) {
+export default function ProjectDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const [projectId, setProjectId] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    params.then(p => setProjectId(p.id));
     setMounted(true);
-  }, []);
+  }, [params]);
 
   const [forking, setForking] = useState(false);
 
@@ -132,9 +134,8 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
                 <button 
                   onClick={() => {
                     // Deep link to VS Code (standard protocol)
-                    window.location.href = "vscode://file/c:/Users/Roshan Teja SU/Downloads/website-main/devgrowth";
                     toast.success("Launching VS Code...");
-                    setShowRoadmap(false);
+                    setShowGuide(false);
                   }}
                   style={{ width: '100%', background: 'var(--primary)', color: 'white', border: 'none', padding: '14px', borderRadius: '10px', fontWeight: 700, marginTop: '32px', cursor: 'pointer' }}
                 >

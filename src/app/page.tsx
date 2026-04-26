@@ -12,7 +12,8 @@ import {
   Clock,
   ArrowRight,
   BrainCircuit,
-  Rocket
+  Rocket,
+  CheckCircle2
 } from "lucide-react";
 import { StatsCard } from "@/components/ui/Cards";
 import { Pomodoro } from "@/components/Pomodoro";
