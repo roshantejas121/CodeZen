@@ -14,24 +14,19 @@
 
 ## 🌟 Core Pillars
 
-### 1. The W3Schools-Style Academy
-A high-density technical library featuring over **50+ chapters** across HTML, CSS, JavaScript, Python, and SQL. 
-*   **Triple-Pane Layout**: Curriculum (Left) → Deep Documentation (Center) → Live IDE (Right).
-*   **Sequential Learning**: Guided "Next/Previous" roadmap for foundational mastery.
-
-### 2. Independent Execution Layer (Zero-Latency)
+### 1. Independent Execution Layer (Zero-Latency)
 A "real-to-the-core" execution engine providing genuine local compilation, bypassing external whitelists.
 *   **Local Python (Pyodide)**: A full CPython interpreter running in the browser via WebAssembly (WASM).
 *   **Local JS Sandbox**: Native browser execution for instant, zero-latency results.
 *   **Real Console**: Live `stdout` and `stderr` feedback in a professional Linux-styled terminal.
 *   **Smart Preview**: Real-time visual rendering for HTML/CSS/JS with "Smart Injector" technology.
 
-### 3. Groq Hyper-Speed AI Mentor
+### 2. Groq Hyper-Speed AI Mentor
 A high-performance technical mentor powered by the **Groq LPU Inference Engine**.
 *   **Near-Instant Reasoning**: Sub-second response times for complex architectural queries.
 *   **Lead Architect Persona**: Targeted advice on clean code, scalability, and modern engineering standards.
 
-### 4. GitHub Intelligence Hub
+### 5. GitHub Intelligence Hub
 A professional discovery center for open-source research and technical evaluation.
 *   **AI Technical Audit**: Simulate deep-dives into any repository for security, quality, and performance.
 
