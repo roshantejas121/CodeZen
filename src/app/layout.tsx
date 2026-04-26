@@ -4,8 +4,8 @@ import { Sidebar } from "@/components/Sidebar";
 import { AIMentor } from "@/components/AIMentor";
 
 export const metadata: Metadata = {
-  title: "DevGrowth | Learning & Developer Productivity",
-  description: "Become a stronger developer and get more work done in less time.",
+  title: "CodeZen | Elite Engineering Hub",
+  description: "Elite engineering guidance, cognitive friction drills, and developer productivity.",
 };
 
 import { Toaster } from 'sonner';

@@ -56,7 +56,7 @@ export function Sidebar() {
         }}>
           <Zap size={24} color="white" fill="white" />
         </div>
-        <h1 style={{ fontSize: '24px', fontWeight: 700 }}>DevGrowth</h1>
+        <h1 style={{ fontSize: '24px', fontWeight: 700 }}>CodeZen</h1>
       </div>
 
       {/* Smart Search Trigger */}
