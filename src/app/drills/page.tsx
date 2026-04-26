@@ -4,40 +4,55 @@ import React, { useState, useEffect } from "react";
 import { Brain, ArrowRight, CheckCircle, Target, XCircle, Flame } from "lucide-react";
 import Link from "next/link";
 
-const DRILL_DB: Record<string, { q: string; a: string }> = {
-  Promise: { q: "What does Promise.all() do vs sequential awaits?", a: "Promise.all() runs promises concurrently. Use it when tasks are independent to minimize total wait time." },
-  await: { q: "Can you use 'await' outside an async function?", a: "No. 'await' is only valid inside an async function or at the top level of ES modules." },
-  map: { q: "How does Array.map() differ from forEach()?", a: "map() returns a new transformed array. forEach() returns undefined and is used only for side effects." },
-  filter: { q: "Does Array.filter() mutate the original array?", a: "No. It returns a brand new array with only elements that pass the test function." },
-  reduce: { q: "What if you omit the initial value in reduce()?", a: "The first array element becomes the accumulator, and iteration starts from the second element." },
-  useEffect: { q: "What happens without a dependency array in useEffect?", a: "The effect runs after every render, which can cause infinite loops if it updates state." },
-  useState: { q: "Why not mutate React state directly?", a: "React uses reference identity to decide re-renders. Direct mutation bypasses React's scheduler." },
-  fetch: { q: "Does fetch() reject on 404 or 500 errors?", a: "No. fetch only rejects on network failures. You must check response.ok manually." },
-  splice: { q: "Does Array.splice() return the removed items or the modified array?", a: "It returns an array of removed elements and mutates the original array in-place." },
-  indexOf: { q: "What does indexOf return if the element is not found?", a: "It returns -1. Always check for -1 rather than falsy values." },
-  split: { q: "What does String.split('') do?", a: "It splits the string into an array of individual characters." },
-  join: { q: "How does Array.join() handle undefined/null elements?", a: "They are converted to empty strings in the joined result." },
-  sort: { q: "Does Array.sort() sort numbers correctly by default?", a: "No. Default sort is lexicographic. Use a comparator: (a,b) => a - b for numeric sort." },
-  slice: { q: "Does Array.slice() mutate the original array?", a: "No. slice returns a shallow copy of a portion of the array." },
-  console: { q: "What is console.table() used for?", a: "It displays tabular data as a table in the console, useful for arrays of objects." },
-  forEach: { q: "Can you break out of a forEach loop early?", a: "No. Use for...of or Array.some()/every() if you need early termination." },
-  push: { q: "What does Array.push() return?", a: "It returns the new length of the array, not the array itself." },
-  pop: { q: "What does pop() return on an empty array?", a: "It returns undefined." },
-  includes: { q: "Does Array.includes() use strict equality?", a: "Yes. It uses the SameValueZero algorithm (similar to ===, but NaN equals NaN)." },
-  find: { q: "What does Array.find() return if no match is found?", a: "It returns undefined." },
-  concat: { q: "Does concat() modify the original array?", a: "No. It returns a new array that is the combination of the arrays." },
-  length: { q: "What happens if you set array.length = 0?", a: "It empties the array in-place, removing all elements." },
-  toString: { q: "When is toString() called implicitly in JS?", a: "When an object is used in a string context, like concatenation or template literals." },
-  parseInt: { q: "What does parseInt('08') return?", a: "8. Modern JS defaults to base 10, but always pass the radix: parseInt('08', 10)." },
-  input: { q: "How does Python's input() handle data types?", a: "input() always returns a string. You must explicitly cast with int(), float(), etc." },
-  range: { q: "Is range() inclusive or exclusive of the end value?", a: "Exclusive. range(0, 5) produces 0,1,2,3,4." },
-  append: { q: "What is the difference between list.append() and list.extend()?", a: "append adds one element. extend adds each element of an iterable individually." },
-  enumerate: { q: "What does enumerate() return?", a: "It returns an iterator of tuples containing (index, value) pairs." },
-  items: { q: "What does dict.items() return in Python?", a: "A view object of (key, value) tuple pairs." },
-  cout: { q: "What is the difference between cout and printf in C++?", a: "cout is type-safe and uses operator<<. printf uses format specifiers and is from C." },
-  vector: { q: "How does std::vector differ from a raw array in C++?", a: "vector is dynamic (resizable), manages its own memory, and provides bounds checking with .at()." },
-  ArrayList: { q: "What is the difference between ArrayList and LinkedList in Java?", a: "ArrayList uses a dynamic array (fast random access). LinkedList uses doubly-linked nodes (fast insert/delete)." },
-  HashMap: { q: "Is Java's HashMap thread-safe?", a: "No. Use ConcurrentHashMap for thread-safe operations." },
+const DRILL_DB: Record<string, { q: string; a: string; code?: string; tip?: string }> = {
+  Promise: { 
+    q: "What does Promise.all() do vs sequential awaits?", 
+    a: "Promise.all() executes all promises in parallel, whereas sequential awaits pause execution for each one. This significantly reduces total latency for independent operations.",
+    code: "// Parallel (Fast)\nconst [res1, res2] = await Promise.all([fetch1(), fetch2()]);\n\n// Sequential (Slow)\nconst res1 = await fetch1();\nconst res2 = await fetch2();",
+    tip: "Use Promise.allSettled() if you need all results even if some fail."
+  },
+  await: { 
+    q: "When is 'await' valid and what does it actually do?", 
+    a: "'await' pauses the execution of an async function until the promise settles. It returns the resolved value or throws the rejected value.",
+    code: "async function getData() {\n  try {\n    const data = await fetch('/api');\n    return await data.json();\n  } catch (e) {\n    console.error('Failed', e);\n  }\n}",
+    tip: "Await is essentially syntax sugar for .then() chaining."
+  },
+  map: { 
+    q: "How does Array.map() differ from forEach()?", 
+    a: "map() creates a brand new array by applying a function to every element. forEach() is just a loop that returns undefined and is used for side effects (like logging).",
+    code: "const nums = [1, 2, 3];\n\n// Returns [2, 4, 6]\nconst doubled = nums.map(n => n * 2);\n\n// Mutates external state\nnums.forEach(n => console.log(n));",
+    tip: "Never use map() if you don't intend to use the returned array."
+  },
+  useEffect: { 
+    q: "How do you prevent memory leaks in useEffect?", 
+    a: "By returning a 'cleanup function'. React calls this before the component unmounts or before re-running the effect to clean up timers, subscriptions, or event listeners.",
+    code: "useEffect(() => {\n  const timer = setInterval(() => tick(), 1000);\n  \n  // CLEANUP\n  return () => clearInterval(timer);\n}, []);",
+    tip: "Always clean up subscriptions to prevent 'update on unmounted component' warnings."
+  },
+  useState: { 
+    q: "Why should you use the functional update pattern in useState?", 
+    a: "When the new state depends on the previous state, the functional pattern ensures you're working with the most current value, avoiding closures over stale data.",
+    code: "// Stale potential\nsetCount(count + 1);\n\n// SAFE: Functional update\nsetCount(prev => prev + 1);",
+    tip: "This is crucial when multiple updates happen in the same render cycle."
+  },
+  vector: { 
+    q: "What is the complexity of inserting into a std::vector?", 
+    a: "O(1) amortized for end insertions. However, if capacity is exceeded, it triggers an O(n) reallocation. Middle insertions are always O(n).",
+    code: "std::vector<int> v = {1, 2, 3};\nv.push_back(4); // O(1) amortized\nv.insert(v.begin(), 0); // O(n) - shift needed",
+    tip: "Use v.reserve() if you know the final size to avoid reallocations."
+  },
+  ArrayList: { 
+    q: "ArrayList vs LinkedList: Which one wins for random access?", 
+    a: "ArrayList wins (O(1)) because it's backed by a contiguous array. LinkedList requires O(n) traversal to reach a specific index.",
+    code: "List<String> list = new ArrayList<>();\nlist.add(\"Data\");\nString item = list.get(0); // Instant access",
+    tip: "Use ArrayList by default unless you perform constant-time insertions at the start/middle."
+  },
+  fetch: {
+    q: "How do you handle a 404 error using the fetch API?",
+    a: "fetch() does NOT throw on 404. It only throws on network failure. You must check the 'ok' property or the 'status' code of the response.",
+    code: "const res = await fetch(url);\nif (!res.ok) {\n  throw new Error(`Status: ${res.status}`);\n}\nconst data = await res.json();",
+    tip: "res.ok is true if status is in the 200-299 range."
+  }
 };
 
 export default function DrillsPage() {
@@ -170,15 +185,37 @@ export default function DrillsPage() {
               </p>
             </div>
           ) : (
-            <div className="glass-card" style={{ padding: "48px 40px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", minHeight: "300px", background: "rgba(59, 130, 246, 0.04)", border: "1px solid rgba(59, 130, 246, 0.15)" }}>
-              <p style={{ fontSize: "18px", fontWeight: 500, color: "white", lineHeight: 1.7, maxWidth: "500px", marginBottom: "32px" }}>
-                {drillData.a}
-              </p>
+            <div className="glass-card" style={{ padding: "40px", display: "flex", flexDirection: "column", alignItems: "flex-start", textAlign: "left", minHeight: "450px", background: "rgba(59, 130, 246, 0.04)", border: "1px solid rgba(59, 130, 246, 0.15)", width: "100%" }}>
+              <div style={{ width: "100%", marginBottom: "24px" }}>
+                <h3 style={{ fontSize: "14px", fontWeight: 800, color: "var(--primary)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px" }}>Explanation</h3>
+                <p style={{ fontSize: "16px", fontWeight: 500, color: "white", lineHeight: 1.6, margin: 0 }}>
+                  {drillData.a}
+                </p>
+              </div>
+
+              {drillData.code && (
+                <div style={{ width: "100%", marginBottom: "24px" }}>
+                  <h3 style={{ fontSize: "14px", fontWeight: 800, color: "var(--primary)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px" }}>Practice Example</h3>
+                  <div style={{ background: "#0f172a", padding: "16px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.05)", position: "relative", width: "100%" }}>
+                    <pre style={{ margin: 0, color: "#e2e8f0", fontSize: "13px", fontFamily: "JetBrains Mono, monospace", overflowX: "auto", whiteSpace: "pre-wrap" }}>
+                      <code>{drillData.code}</code>
+                    </pre>
+                  </div>
+                </div>
+              )}
+
+              {drillData.tip && (
+                <div style={{ width: "100%", padding: "12px 16px", background: "rgba(16, 185, 129, 0.05)", borderLeft: "4px solid #10b981", borderRadius: "4px", marginBottom: "32px" }}>
+                  <span style={{ fontSize: "12px", fontWeight: 800, color: "#10b981", display: "block", marginBottom: "4px" }}>PRO TIP</span>
+                  <p style={{ fontSize: "13px", color: "#a7f3d0", margin: 0 }}>{drillData.tip}</p>
+                </div>
+              )}
+
               <button
                 onClick={(e) => { e.stopPropagation(); handleNext(); }}
-                style={{ background: "var(--primary)", color: "white", border: "none", padding: "14px 36px", borderRadius: "12px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", boxShadow: "0 10px 20px rgba(59, 130, 246, 0.3)", fontSize: "15px" }}
+                style={{ background: "var(--primary)", color: "white", border: "none", padding: "14px 36px", borderRadius: "12px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "8px", boxShadow: "0 10px 20px rgba(59, 130, 246, 0.3)", fontSize: "15px", alignSelf: "center", marginTop: "auto" }}
               >
-                {currentDrill < frictionTokens.length - 1 ? "Next Drill" : "Finish"} <ArrowRight size={16} />
+                {currentDrill < frictionTokens.length - 1 ? "Next Drill" : "Finish Session"} <ArrowRight size={16} />
               </button>
             </div>
           )}
