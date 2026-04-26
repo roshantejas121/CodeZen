@@ -3,6 +3,13 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   // Pull key from secure environment variables
   const apiKey = process.env.GROQ_API_KEY;
+
+  if (!apiKey) {
+    return NextResponse.json({ 
+      role: "assistant", 
+      content: "System Note: Intelligence Engine requires a valid GROQ_API_KEY in your environment variables. Please add it to your Vercel Dashboard to enable the AI Mentor." 
+    });
+  }
   
   try {
     const { messages } = await req.json();
