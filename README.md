@@ -26,7 +26,7 @@ A high-performance technical mentor powered by the **Groq LPU Inference Engine**
 *   **Near-Instant Reasoning**: Sub-second response times for complex architectural queries.
 *   **Lead Architect Persona**: Targeted advice on clean code, scalability, and modern engineering standards.
 
-### 5. GitHub Intelligence Hub
+### 3. GitHub Intelligence Hub
 A professional discovery center for open-source research and technical evaluation.
 *   **AI Technical Audit**: Simulate deep-dives into any repository for security, quality, and performance.
 
