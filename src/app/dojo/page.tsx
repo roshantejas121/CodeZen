@@ -51,7 +51,7 @@ export default function DojoPage() {
       <div className="glass-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 32px', borderTop: 'none', borderLeft: 'none', borderRight: 'none', borderRadius: 0, margin: '-20px 40px 0 40px', position: 'relative', zIndex: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <Zap size={24} color="var(--primary)" />
-          <h1 style={{ fontSize: '24px', fontWeight: 900, margin: 0, letterSpacing: '1px', color: 'white' }}>DOJO WORKOUTS</h1>
+          <h1 style={{ fontSize: '24px', fontWeight: 900, margin: 0, letterSpacing: '1px', color: 'white' }}>CZ WORKOUTS</h1>
         </div>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '24px', fontSize: '13px', fontWeight: 600, color: 'var(--text-muted)' }}>

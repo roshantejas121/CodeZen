@@ -67,6 +67,65 @@ export default function WorkoutPage() {
   const [consoleOutput, setConsoleOutput] = useState("");
   const [timeLeft, setTimeLeft] = useState(3600); // 1 hour in seconds
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const editorRef = React.useRef<any>(null);
+  const lastActivityRef = React.useRef<number>(Date.now());
+  const frictionIntervalRef = React.useRef<any>(null);
+  const IGNORED_TOKENS = ['const', 'let', 'var', 'function', 'return', 'if', 'else', 'for', 'while', 'import', 'from', 'export', 'default', 'new', 'this', 'true', 'false', 'null', 'undefined', 'class', 'extends', 'try', 'catch', 'throw', 'switch', 'case', 'break', 'continue', 'do', 'in', 'of', 'typeof', 'instanceof', 'void', 'delete', 'yield', 'async', 'def', 'print', 'self', 'None', 'True', 'False', 'int', 'str', 'main', 'include', 'using', 'namespace', 'std', 'public', 'static', 'void', 'String', 'args', 'System', 'out', 'println'];
+
+  const handleEditorDidMount = (editor: any) => {
+    editorRef.current = editor;
+    lastActivityRef.current = Date.now();
+
+    // Track all user activity (typing, clicking, cursor movement)
+    editor.onDidChangeCursorPosition(() => {
+      lastActivityRef.current = Date.now();
+    });
+
+    // Continuous idle detection: poll every 2 seconds
+    frictionIntervalRef.current = setInterval(() => {
+      const idleMs = Date.now() - lastActivityRef.current;
+      if (idleMs < 4000) return; // Not idle long enough
+
+      const position = editor.getPosition();
+      const model = editor.getModel();
+      if (!position || !model) return;
+
+      // Grab the line content near the cursor
+      const lineContent = model.getLineContent(position.lineNumber);
+      
+      // Extract meaningful tokens from the current line
+      const tokens = lineContent.match(/[a-zA-Z_]\w*/g) || [];
+      const meaningfulTokens = tokens.filter((t: string) => 
+        t.length > 2 && !IGNORED_TOKENS.includes(t)
+      );
+
+      if (meaningfulTokens.length > 0) {
+        const saved = localStorage.getItem('cz_friction_map');
+        const map: Record<string, number> = saved ? JSON.parse(saved) : {};
+        
+        // Log all meaningful tokens on the line the user is stuck on
+        meaningfulTokens.forEach((token: string) => {
+          map[token] = (map[token] || 0) + 1;
+        });
+
+        localStorage.setItem('cz_friction_map', JSON.stringify(map));
+        // Reset so we don't log the same pause twice
+        lastActivityRef.current = Date.now();
+      }
+    }, 2000);
+  };
+
+  // Cleanup friction interval on unmount
+  useEffect(() => {
+    return () => {
+      if (frictionIntervalRef.current) clearInterval(frictionIntervalRef.current);
+    };
+  }, []);
+
+  const handleEditorChange = (val: string | undefined) => {
+    setCode(val || "");
+    lastActivityRef.current = Date.now();
+  };
 
   useEffect(() => {
     // Determine user's current level for this language
@@ -303,7 +362,7 @@ sys.stderr = io.StringIO()
           <button 
             onClick={() => router.push('/dojo')}
             style={{ width: '100%', padding: '16px', background: passed ? 'var(--primary)' : 'rgba(255,255,255,0.05)', color: 'white', border: passed ? 'none' : '1px solid var(--card-border)', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', boxShadow: passed ? '0 10px 20px rgba(59, 130, 246, 0.3)' : 'none', marginTop: passed && level < 5 ? 0 : '20px' }}>
-            Return to Dojo
+            Return to CZ Workouts
           </button>
         </div>
       </div>
@@ -371,7 +430,8 @@ sys.stderr = io.StringIO()
               language={language.toLowerCase() === 'c++' ? 'cpp' : language.toLowerCase()}
               theme="vs-dark"
               value={code}
-              onChange={(val) => setCode(val || "")}
+              onChange={handleEditorChange}
+              onMount={handleEditorDidMount}
               options={{
                 minimap: { enabled: false },
                 fontSize: 14,

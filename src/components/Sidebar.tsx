@@ -12,7 +12,8 @@ import {
   LogOut,
   Zap,
   Book,
-  Search
+  Search,
+  Target
 } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 import { motion } from "framer-motion";
@@ -23,7 +24,8 @@ const menuItems = [
   { icon: BookOpen, label: "Certifications", href: "/lessons" },
   { icon: Code2, label: "Project Lab", href: "/projects" },
   { icon: FaGithub, label: "GitHub Hub", href: "/github" },
-  { icon: Zap, label: "DOJO Workouts", href: "/dojo" },
+  { icon: Zap, label: "CZ Workouts", href: "/dojo" },
+  { icon: Target, label: "Daily Drills", href: "/drills" },
   { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
 ];
 
