@@ -14,7 +14,7 @@ export async function POST(req: Request) {
         "Authorization": `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "llama3-8b-8192", // High-reliability model
+        model: "llama-3.3-70b-versatile", // High-reliability model
         messages: [
           { 
             role: "system", 
