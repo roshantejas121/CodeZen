@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { AIMentor } from "@/components/AIMentor";
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://codezen-live-rho.vercel.app'),
   title: "CodeZen | Elite Engineering Hub",
   description: "Elite engineering guidance, cognitive friction drills, and developer productivity.",
 };
