@@ -21,7 +21,8 @@ export default function GitHubHub() {
   const { user } = useUser();
   const [repos, setRepos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [query, setQuery] = useState('react');
+  const [query, setQuery] = useState('');
+  const [activeTopic, setActiveTopic] = useState('Recommended');
   const [auditStatus, setAuditStatus] = useState<Record<string, 'ready' | 'analyzing' | 'completed'>>({});
 
   const runAudit = (repoName: string) => {
@@ -99,6 +100,8 @@ export default function GitHubHub() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!query.trim()) return;
+    setActiveTopic(query);
     fetchRepos(query);
   };
 
@@ -157,6 +160,15 @@ export default function GitHubHub() {
             {loading ? 'Analyzing...' : 'Execute'}
           </button>
         </form>
+
+        {/* Discovery Results Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '-20px' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: 800 }}>{activeTopic} Assets</h2>
+          <div style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div className="animate-pulse" style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--primary)' }} />
+            Intelligence Sync Active
+          </div>
+        </div>
 
         {/* Discovery Results Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
@@ -290,7 +302,7 @@ export default function GitHubHub() {
             {['Generative AI', 'Web3', 'Rust', 'Cloud Native', 'Cybersecurity', 'DevOps'].map(topic => (
               <button 
                 key={topic}
-                onClick={() => { setQuery(topic); fetchRepos(topic); }}
+                onClick={() => { setQuery(''); setActiveTopic(topic); fetchRepos(topic); }}
                 style={{ 
                   padding: '8px 16px', 
                   background: 'rgba(59, 130, 246, 0.05)', 
