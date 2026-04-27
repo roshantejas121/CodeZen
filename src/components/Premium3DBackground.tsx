@@ -5,70 +5,83 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, MeshDistortMaterial, Sphere, MeshWobbleMaterial } from "@react-three/drei";
 import * as THREE from "three";
 
-function FloatingOrbs() {
+function StarField({ count = 1000 }) {
+  const points = useMemo(() => {
+    const p = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      p[i * 3] = (Math.random() - 0.5) * 100;
+      p[i * 3 + 1] = (Math.random() - 0.5) * 100;
+      p[i * 3 + 2] = (Math.random() - 0.5) * 100;
+    }
+    return p;
+  }, [count]);
+
   return (
-    <>
-      <Float speed={2} rotationIntensity={1} floatIntensity={2}>
-        <Sphere args={[1.5, 64, 64]} position={[-5, 2, -10]}>
-          <MeshDistortMaterial
-            color="#3b82f6"
-            speed={3}
-            distort={0.4}
-            radius={1}
-            emissive="#1e3a8a"
-            emissiveIntensity={0.5}
-            roughness={0}
-            metalness={1}
-          />
-        </Sphere>
-      </Float>
-
-      <Float speed={1.5} rotationIntensity={2} floatIntensity={1.5}>
-        <Sphere args={[1, 64, 64]} position={[6, -3, -8]}>
-          <MeshWobbleMaterial
-            color="#8b5cf6"
-            speed={2}
-            factor={0.5}
-            emissive="#4c1d95"
-            emissiveIntensity={0.3}
-            roughness={0.1}
-          />
-        </Sphere>
-      </Float>
-
-      <Float speed={3} rotationIntensity={0.5} floatIntensity={3}>
-        <Sphere args={[0.8, 64, 64]} position={[0, 4, -12]}>
-          <MeshDistortMaterial
-            color="#0ea5e9"
-            speed={5}
-            distort={0.6}
-            radius={1}
-            emissive="#0c4a6e"
-            emissiveIntensity={0.4}
-          />
-        </Sphere>
-      </Float>
-    </>
+    <points>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          count={points.length / 3}
+          array={points}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.08}
+        color="#ffffff"
+        transparent
+        opacity={0.4}
+        sizeAttenuation
+      />
+    </points>
   );
 }
 
-function Particles({ count = 100 }) {
+function AuroraRibbon({ color, position, speed }: { color: string, position: [number, number, number], speed: number }) {
+  const mesh = useRef<THREE.Mesh>(null!);
+  
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime() * speed;
+    mesh.current.rotation.z = Math.sin(t * 0.1) * 0.2;
+    mesh.current.position.y = position[1] + Math.sin(t * 0.3) * 1.5;
+    mesh.current.position.x = position[0] + Math.cos(t * 0.2) * 2;
+  });
+
+  return (
+    <mesh ref={mesh} position={position} rotation={[-Math.PI / 3, 0, 0]}>
+      <planeGeometry args={[50, 15, 64, 64]} />
+      <MeshDistortMaterial
+        color={color}
+        speed={2}
+        distort={0.5}
+        radius={1}
+        transparent
+        opacity={0.12}
+        emissive={color}
+        emissiveIntensity={0.8}
+        side={THREE.DoubleSide}
+      />
+    </mesh>
+  );
+}
+
+function Particles({ count = 150 }) {
   const mesh = useRef<THREE.Points>(null!);
   
   const particles = useMemo(() => {
     const temp: number[] = [];
     for (let i = 0; i < count; i++) {
-      const x = THREE.MathUtils.randFloatSpread(40);
-      const y = THREE.MathUtils.randFloatSpread(40);
-      const z = THREE.MathUtils.randFloatSpread(40);
+      const x = THREE.MathUtils.randFloatSpread(50);
+      const y = THREE.MathUtils.randFloatSpread(50);
+      const z = THREE.MathUtils.randFloatSpread(50);
       temp.push(x, y, z);
     }
     return new Float32Array(temp);
   }, [count]);
 
   useFrame((state) => {
-    mesh.current.rotation.y = state.clock.getElapsedTime() * 0.05;
-    mesh.current.rotation.x = state.clock.getElapsedTime() * 0.03;
+    mesh.current.rotation.y = state.clock.getElapsedTime() * 0.02;
+    mesh.current.rotation.x = state.clock.getElapsedTime() * 0.01;
   });
 
   return (
@@ -91,43 +104,10 @@ function Particles({ count = 100 }) {
           size={0.05}
           color="#ffffff"
           transparent
-          opacity={0.3}
+          opacity={0.2}
           sizeAttenuation
         />
       </points>
-    </>
-  );
-}
-
-function CollaborativeOrbs({ count = 15 }) {
-  const orbs = useMemo(() => {
-    return Array.from({ length: count }).map(() => ({
-      position: [
-        THREE.MathUtils.randFloatSpread(20),
-        THREE.MathUtils.randFloatSpread(20),
-        THREE.MathUtils.randFloatSpread(10) - 15
-      ],
-      speed: Math.random() * 0.5 + 0.2,
-      color: Math.random() > 0.5 ? '#3b82f6' : '#8b5cf6'
-    }));
-  }, [count]);
-
-  return (
-    <>
-      {orbs.map((orb, i) => (
-        <Float key={i} speed={orb.speed} rotationIntensity={1} floatIntensity={2}>
-          <Sphere args={[0.2, 16, 16]} position={orb.position as [number, number, number]}>
-            <MeshDistortMaterial
-              color={orb.color}
-              speed={2}
-              distort={0.3}
-              radius={1}
-              emissive={orb.color}
-              emissiveIntensity={0.2}
-            />
-          </Sphere>
-        </Float>
-      ))}
     </>
   );
 }
@@ -142,18 +122,18 @@ export function Premium3DBackground() {
       height: '100vh', 
       zIndex: -1, 
       pointerEvents: 'none',
-      background: 'linear-gradient(to bottom, #020617, #0f172a)' 
+      background: 'linear-gradient(to bottom, #020617, #0a1128)' 
     }}>
-      <Canvas camera={{ position: [0, 0, 10], fov: 50 }}>
-        {/* @ts-ignore */}
+      <Canvas camera={{ position: [0, 0, 20], fov: 45 }}>
         <ambientLight intensity={0.5} />
-        {/* @ts-ignore */}
-        <pointLight position={[10, 10, 10]} intensity={1} color="#3b82f6" />
-        {/* @ts-ignore */}
-        <pointLight position={[-10, -10, -10]} intensity={0.5} color="#8b5cf6" />
-        <FloatingOrbs />
-        <CollaborativeOrbs count={20} />
-        <Particles count={200} />
+        
+        <StarField count={2000} />
+        
+        <AuroraRibbon color="#3b82f6" position={[0, 8, -20]} speed={0.5} />
+        <AuroraRibbon color="#8b5cf6" position={[-5, -5, -25]} speed={0.3} />
+        <AuroraRibbon color="#0ea5e9" position={[5, 0, -15]} speed={0.7} />
+
+        <Particles count={300} />
       </Canvas>
     </div>
   );
