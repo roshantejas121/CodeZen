@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
   LayoutDashboard, BookOpen, Code2, Trophy, Settings,
-  Zap, Book, Search, Target, Flame, Star
+  Zap, Book, Search, Target, Flame, Star, ShieldAlert
 } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 import { motion } from "framer-motion";
