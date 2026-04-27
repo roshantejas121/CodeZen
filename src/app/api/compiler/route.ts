@@ -31,28 +31,41 @@ export async function POST(req: Request) {
   try {
     const { code, language } = await req.json();
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000);
+    const timeoutId = setTimeout(() => controller.abort(), 25000); // Increased to 25s for large code
 
     // 1. Try Judge0 CE (Primary - High Performance)
     const judgeId = JUDGE0_MAP[language];
     if (judgeId) {
       try {
-        const res = await fetch('https://ce.judge0.com/submissions?base64_encoded=false&wait=true', {
+        const base64Code = Buffer.from(code).toString('base64');
+        const res = await fetch('https://ce.judge0.com/submissions?base64_encoded=true&wait=true', {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0',
             'Referer': 'https://devgrowth-beta.vercel.app'
           },
-          body: JSON.stringify({ source_code: code, language_id: judgeId }),
+          body: JSON.stringify({ 
+            source_code: base64Code, 
+            language_id: judgeId,
+            cpu_time_limit: 10, // 10s CPU time
+            wall_time_limit: 20, // 20s Wall time
+            memory_limit: 512000 // 512MB RAM
+          }),
           signal: controller.signal
         });
 
         if (res.ok) {
           const result = await res.json();
           clearTimeout(timeoutId);
-          const output = result.stdout || result.stderr || result.compile_output || 'Code executed with no output.';
-          return NextResponse.json({ output, hasError: !!(result.stderr || result.compile_output) });
+          
+          const decode = (str: string) => str ? Buffer.from(str, 'base64').toString('utf8') : '';
+          const stdout = decode(result.stdout);
+          const stderr = decode(result.stderr);
+          const compile_output = decode(result.compile_output);
+          
+          const output = stdout || stderr || compile_output || 'Code executed with no output.';
+          return NextResponse.json({ output, hasError: !!(stderr || compile_output) });
         }
         lastStatus = res.status;
       } catch (e) {
@@ -75,13 +88,15 @@ export async function POST(req: Request) {
             method: 'POST',
             headers: { 
               'Content-Type': 'application/json',
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+              'User-Agent': 'Mozilla/5.0',
               'Referer': 'https://devgrowth-beta.vercel.app'
             },
             body: JSON.stringify({
               language: target.language,
               version: target.version,
-              files: [{ name: `main.txt`, content: code }]
+              files: [{ name: `main.txt`, content: code }],
+              run_timeout: 20000, // 20s
+              compile_timeout: 20000
             }),
             signal: controller.signal
           });
@@ -89,7 +104,7 @@ export async function POST(req: Request) {
           if (response.ok) {
             const result = await response.json();
             clearTimeout(timeoutId);
-            const output = result.run.stdout || result.run.stderr || 'Program exited with no output.';
+            const output = (result.run.stdout || result.run.stderr || 'Program exited with no output.').trim();
             return NextResponse.json({ output, hasError: !!result.run.stderr });
           }
           lastStatus = response.status;
@@ -100,10 +115,12 @@ export async function POST(req: Request) {
     }
 
     clearTimeout(timeoutId);
-    return NextResponse.json({ output: 'Compiler services are currently overwhelmed. Please try again in a few seconds.' }, { status: 503 });
+    return NextResponse.json({ 
+      output: `Compiler services overwhelmed or returned error (${lastStatus}). For huge code, try optimized algorithms.` 
+    }, { status: lastStatus || 500 });
 
   } catch (error: any) {
-    if (error.name === 'AbortError') return NextResponse.json({ output: 'Execution timed out (12s limit).' });
-    return NextResponse.json({ output: 'Internal Compiler Fault. Please check your code syntax.' });
+    if (error.name === 'AbortError') return NextResponse.json({ output: 'Execution timed out (25s limit). For heavy computations, use more efficient code.' });
+    return NextResponse.json({ output: 'Internal Compiler Fault. Payload might be too large for public clusters.' });
   }
 }
