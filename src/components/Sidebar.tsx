@@ -13,6 +13,7 @@ import { useUser } from "@/context/UserContext";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard",      href: "/" },
+  { icon: Flame,           label: "Elite Bootcamp", href: "/bootcamp" },
   { icon: Book,            label: "Academy",        href: "/academy" },
   { icon: BookOpen,        label: "Certifications", href: "/lessons" },
   { icon: Code2,           label: "Project Lab",    href: "/projects" },
