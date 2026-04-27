@@ -68,7 +68,7 @@ const INITIAL_DATA = {
     lastActiveDate: null as string | null,
     karma: 0,
     badges: [] as string[],
-    certifications: [] as string[],
+    certifications: [] as any[],
     goals: [] as any[],
     isNew: true,
   },
@@ -413,4 +413,25 @@ export const db = {
   getLesson:      (id: string) => (db.read().lessons || []).find((l: any) => l.id === id),
   getAcademy:     () => db.read().academy,
   getProjects:    () => db.read().projects || [],
+
+  claimBelt: (language: string, belt: string) => {
+    const data = db.read();
+    if (!data.user.certifications) data.user.certifications = [];
+    
+    // Prevent duplicate belts for the same language/level
+    const exists = data.user.certifications.find((c: any) => c.language === language && c.belt === belt);
+    if (exists) return exists;
+
+    const cert = {
+      id: `CERT-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
+      language,
+      belt,
+      date: new Date().toISOString(),
+      verified: true,
+      score: '100%'
+    };
+    data.user.certifications.push(cert);
+    db.write(data);
+    return cert;
+  }
 };

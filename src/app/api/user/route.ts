@@ -29,6 +29,14 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ ...fresh.user, ...getLevelInfo(fresh.user.xp) });
     }
 
+    // Handle belt certification
+    if (updates.claimBelt) {
+      const { language, belt } = updates.claimBelt;
+      const cert = db.claimBelt(language, belt);
+      const fresh = db.read();
+      return NextResponse.json({ ...fresh.user, ...getLevelInfo(fresh.user.xp), newCert: cert });
+    }
+
     data.user = { ...data.user, ...updates };
     db.write(data);
     return NextResponse.json({ ...data.user, ...getLevelInfo(data.user.xp) });

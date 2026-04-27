@@ -7,6 +7,7 @@ interface UserContextType {
   loading: boolean;
   refreshUser: () => Promise<void>;
   awardXP: (amount: number) => Promise<void>;
+  claimBelt: (language: string, belt: string) => Promise<any>;
 }
 
 const UserContext = createContext<UserContextType>({
@@ -14,6 +15,7 @@ const UserContext = createContext<UserContextType>({
   loading: true,
   refreshUser: async () => {},
   awardXP: async () => {},
+  claimBelt: async () => {},
 });
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
@@ -46,6 +48,21 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const claimBelt = useCallback(async (language: string, belt: string) => {
+    try {
+      const res = await fetch('/api/user', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ claimBelt: { language, belt } }),
+      });
+      const updated = await res.json();
+      setUser(updated);
+      return updated.newCert;
+    } catch (e) {
+      console.error("Failed to claim belt:", e);
+    }
+  }, []);
+
   useEffect(() => {
     refreshUser();
     // Poll every 15 seconds to stay in sync
@@ -54,7 +71,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   }, [refreshUser]);
 
   return (
-    <UserContext.Provider value={{ user, loading, refreshUser, awardXP }}>
+    <UserContext.Provider value={{ user, loading, refreshUser, awardXP, claimBelt }}>
       {children}
     </UserContext.Provider>
   );

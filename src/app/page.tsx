@@ -191,6 +191,49 @@ export default function Dashboard() {
           <StatsCard title="XP to Next Lvl" value={user?.isMaxLevel ? '∞ MAX' : `${user?.xpNeeded?.toLocaleString() || 300} XP`} icon={Target} trend="Keep coding!" color="var(--accent)" />
         </div>
 
+        {/* ── Verified Portfolio ── */}
+        {user?.certifications && user.certifications.length > 0 && (
+          <section>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+              <div className="bg-gradient animate-pulse-glow" style={{ width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Award size={16} color="white" />
+              </div>
+              <h2 style={{ fontSize: '20px', fontWeight: 800 }}>Verified Portfolio</h2>
+              <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, var(--card-border) 0%, transparent 100%)' }} />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
+              {user.certifications.map((cert: any) => (
+                <div key={cert.id} className="glass-card" style={{ padding: '24px', border: '1px solid var(--card-border)', background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(59,130,246,0.05) 100%)', position: 'relative', overflow: 'hidden' }}>
+                  <div style={{ position: 'absolute', right: '-20px', top: '-20px', width: '80px', height: '80px', background: 'var(--primary)', opacity: 0.05, borderRadius: '50%' }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+                    <div>
+                      <span style={{ fontSize: '10px', fontWeight: 900, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '1.5px', display: 'block', marginBottom: '4px' }}>VERIFIED BELT</span>
+                      <h3 style={{ fontSize: '20px', fontWeight: 900, color: 'white', textTransform: 'capitalize' }}>{cert.language} {cert.belt}</h3>
+                    </div>
+                    <div style={{ padding: '8px', borderRadius: '10px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                      <CheckCircle2 size={20} color="#10b981" />
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                      <span style={{ color: 'var(--text-muted)' }}>Status</span>
+                      <span style={{ color: '#10b981', fontWeight: 700 }}>Mastered</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                      <span style={{ color: 'var(--text-muted)' }}>Issued</span>
+                      <span style={{ color: 'white', fontWeight: 600 }}>{new Date(cert.date).toLocaleDateString()}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginTop: '8px', padding: '10px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', border: '1px dashed var(--card-border)' }}>
+                      <span style={{ color: 'var(--text-muted)', fontFamily: 'monospace' }}>{cert.id}</span>
+                      <span style={{ color: 'var(--primary)', fontWeight: 800, cursor: 'pointer' }}>COPY ID</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* ── Mastery Shortcuts ── */}
         <section>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
