@@ -30,6 +30,7 @@ const PISTON_MAP: Record<string, { language: string; version: string }> = {
 };
 
 export async function POST(req: Request) {
+  let lastStatus: number | undefined;
   try {
     const { code, language } = await req.json();
     const controller = new AbortController();
