@@ -20,6 +20,7 @@ const menuItems = [
   { icon: FaGithub,        label: "GitHub Hub",     href: "/github" },
   { icon: Zap,             label: "CZ Workouts",    href: "/dojo" },
   { icon: Target,          label: "Daily Drills",   href: "/drills" },
+  { icon: ShieldAlert,     label: "Shadow Ops",     href: "/shadow" },
   { icon: Trophy,          label: "Leaderboard",    href: "/leaderboard" },
 ];
 

@@ -99,6 +99,39 @@ function Particles({ count = 100 }) {
   );
 }
 
+function CollaborativeOrbs({ count = 15 }) {
+  const orbs = useMemo(() => {
+    return Array.from({ length: count }).map(() => ({
+      position: [
+        THREE.MathUtils.randFloatSpread(20),
+        THREE.MathUtils.randFloatSpread(20),
+        THREE.MathUtils.randFloatSpread(10) - 15
+      ],
+      speed: Math.random() * 0.5 + 0.2,
+      color: Math.random() > 0.5 ? '#3b82f6' : '#8b5cf6'
+    }));
+  }, [count]);
+
+  return (
+    <>
+      {orbs.map((orb, i) => (
+        <Float key={i} speed={orb.speed} rotationIntensity={1} floatIntensity={2}>
+          <Sphere args={[0.2, 16, 16]} position={orb.position as [number, number, number]}>
+            <MeshDistortMaterial
+              color={orb.color}
+              speed={2}
+              distort={0.3}
+              radius={1}
+              emissive={orb.color}
+              emissiveIntensity={0.2}
+            />
+          </Sphere>
+        </Float>
+      ))}
+    </>
+  );
+}
+
 export function Premium3DBackground() {
   return (
     <div style={{ 
@@ -119,6 +152,7 @@ export function Premium3DBackground() {
         {/* @ts-ignore */}
         <pointLight position={[-10, -10, -10]} intensity={0.5} color="#8b5cf6" />
         <FloatingOrbs />
+        <CollaborativeOrbs count={20} />
         <Particles count={200} />
       </Canvas>
     </div>
