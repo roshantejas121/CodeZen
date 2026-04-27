@@ -39,43 +39,52 @@ export async function POST(req: Request) {
       sqlite3: 'sql', csharp: 'cs', php: 'php', bash: 'sh', lua: 'lua', rscript: 'r'
     };
 
-    const response = await fetch('https://emkc.org/api/v2/piston/execute', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'User-Agent': 'CodeZen-DevGrowth/1.0'
-      },
-      body: JSON.stringify({
-        language: target.language,
-        version: target.version,
-        files: [{ 
-          name: `main.${extMap[target.language] || 'txt'}`,
-          content: code 
-        }],
-      }),
-      signal: controller.signal,
-    });
+    const endpoints = [
+      'https://piston.engineer/api/v2/execute',
+      'https://emkc.org/api/v2/piston/execute'
+    ];
+
+    let lastStatus = 0;
+    for (const url of endpoints) {
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+          },
+          body: JSON.stringify({
+            language: target.language,
+            version: target.version,
+            files: [{ 
+              name: `main.${extMap[target.language] || 'txt'}`,
+              content: code 
+            }],
+          }),
+          signal: controller.signal,
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          clearTimeout(timeoutId);
+          
+          if (result.run) {
+            const stdout = result.run.stdout?.trim();
+            const stderr = result.run.stderr?.trim();
+            const output = stdout || stderr || 'Program exited with no output.';
+            return NextResponse.json({ output, hasError: !!stderr && !stdout });
+          }
+        }
+        lastStatus = response.status;
+      } catch (e) {
+        console.error(`Compiler fetch error for ${url}:`, e);
+      }
+    }
 
     clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      return NextResponse.json({ output: `Compiler service returned an error (${response.status}). Please try again.` });
-    }
-
-    const result = await response.json();
-
-    if (result.message) {
-      return NextResponse.json({ output: `Compilation Error: ${result.message}` });
-    }
-
-    if (result.run) {
-      const stdout = result.run.stdout?.trim();
-      const stderr = result.run.stderr?.trim();
-      const output = stdout || stderr || 'Program exited with no output.';
-      return NextResponse.json({ output, hasError: !!stderr && !stdout });
-    }
-
-    return NextResponse.json({ output: 'No output received from execution engine.' });
+    return NextResponse.json({ 
+      output: `Compiler service unreachable or returned error (${lastStatus}). Please try again later.` 
+    }, { status: lastStatus || 500 });
 
   } catch (error: any) {
     if (error.name === 'AbortError') {
