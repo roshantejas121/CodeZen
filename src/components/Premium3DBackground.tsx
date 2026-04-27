@@ -2,15 +2,68 @@
 
 import React, { useRef, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, MeshDistortMaterial, Sphere, MeshWobbleMaterial } from "@react-three/drei";
 import * as THREE from "three";
 
-function StarField({ count = 1000 }) {
+function CyberGrid() {
+  const gridRef = useRef<THREE.Group>(null!);
+
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime();
+    gridRef.current.position.z = (t * 2) % 10; // Endless scroll effect
+  });
+
+  return (
+    <group ref={gridRef}>
+      {/* Floor Grid */}
+      <gridHelper args={[100, 50, "#38bdf8", "#0f172a"]} position={[0, -10, 0]} rotation={[0, 0, 0]} />
+      {/* Ceiling Grid */}
+      <gridHelper args={[100, 50, "#38bdf8", "#0f172a"]} position={[0, 15, 0]} rotation={[0, 0, 0]} />
+    </group>
+  );
+}
+
+function DataStream({ count = 40 }) {
+  const lines = useMemo(() => {
+    return Array.from({ length: count }).map(() => ({
+      x: (Math.random() - 0.5) * 40,
+      z: (Math.random() - 0.5) * 20 - 10,
+      yStart: 20,
+      speed: Math.random() * 0.2 + 0.1,
+      length: Math.random() * 5 + 2,
+      opacity: Math.random() * 0.3 + 0.1
+    }));
+  }, [count]);
+
+  return (
+    <group>
+      {lines.map((line, i) => (
+        <DataLine key={i} {...line} />
+      ))}
+    </group>
+  );
+}
+
+function DataLine({ x, z, yStart, speed, length, opacity }: any) {
+  const mesh = useRef<THREE.Mesh>(null!);
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime() * speed;
+    mesh.current.position.y = yStart - ((t * 20) % 40);
+  });
+
+  return (
+    <mesh ref={mesh} position={[x, yStart, z]}>
+      <boxGeometry args={[0.02, length, 0.02]} />
+      <meshBasicMaterial color="#38bdf8" transparent opacity={opacity} />
+    </mesh>
+  );
+}
+
+function StarField({ count = 1500 }) {
   const points = useMemo(() => {
     const p = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
       p[i * 3] = (Math.random() - 0.5) * 100;
-      p[i * 3 + 1] = (Math.random() - 0.5) * 100;
+      p[i * 3 + 1] = (Math.random() - 0.5) * 60;
       p[i * 3 + 2] = (Math.random() - 0.5) * 100;
     }
     return p;
@@ -27,88 +80,13 @@ function StarField({ count = 1000 }) {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.08}
+        size={0.06}
         color="#ffffff"
         transparent
-        opacity={0.4}
+        opacity={0.3}
         sizeAttenuation
       />
     </points>
-  );
-}
-
-function AuroraRibbon({ color, position, speed }: { color: string, position: [number, number, number], speed: number }) {
-  const mesh = useRef<THREE.Mesh>(null!);
-  
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime() * speed;
-    mesh.current.rotation.z = Math.sin(t * 0.1) * 0.2;
-    mesh.current.position.y = position[1] + Math.sin(t * 0.3) * 1.5;
-    mesh.current.position.x = position[0] + Math.cos(t * 0.2) * 2;
-  });
-
-  return (
-    <mesh ref={mesh} position={position} rotation={[-Math.PI / 3, 0, 0]}>
-      <planeGeometry args={[50, 15, 64, 64]} />
-      <MeshDistortMaterial
-        color={color}
-        speed={2}
-        distort={0.5}
-        radius={1}
-        transparent
-        opacity={0.12}
-        emissive={color}
-        emissiveIntensity={0.8}
-        side={THREE.DoubleSide}
-      />
-    </mesh>
-  );
-}
-
-function Particles({ count = 150 }) {
-  const mesh = useRef<THREE.Points>(null!);
-  
-  const particles = useMemo(() => {
-    const temp: number[] = [];
-    for (let i = 0; i < count; i++) {
-      const x = THREE.MathUtils.randFloatSpread(50);
-      const y = THREE.MathUtils.randFloatSpread(50);
-      const z = THREE.MathUtils.randFloatSpread(50);
-      temp.push(x, y, z);
-    }
-    return new Float32Array(temp);
-  }, [count]);
-
-  useFrame((state) => {
-    mesh.current.rotation.y = state.clock.getElapsedTime() * 0.02;
-    mesh.current.rotation.x = state.clock.getElapsedTime() * 0.01;
-  });
-
-  return (
-    <>
-      {/* @ts-ignore */}
-      <points ref={mesh}>
-        {/* @ts-ignore */}
-        <bufferGeometry>
-          {/* @ts-ignore */}
-          <bufferAttribute
-            attach="attributes-position"
-            count={particles.length / 3}
-            array={particles}
-            itemSize={3}
-          />
-        {/* @ts-ignore */}
-        </bufferGeometry>
-        {/* @ts-ignore */}
-        <pointsMaterial
-          size={0.05}
-          color="#ffffff"
-          transparent
-          opacity={0.2}
-          sizeAttenuation
-        />
-      </points>
-    </>
   );
 }
 
@@ -122,18 +100,22 @@ export function Premium3DBackground() {
       height: '100vh', 
       zIndex: -1, 
       pointerEvents: 'none',
-      background: 'linear-gradient(to bottom, #020617, #0a1128)' 
+      background: '#020617' 
     }}>
-      <Canvas camera={{ position: [0, 0, 20], fov: 45 }}>
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.05) 0%, transparent 80%)',
+        zIndex: 1
+      }} />
+      
+      <Canvas camera={{ position: [0, 2, 15], fov: 45 }}>
+        <fog attach="fog" args={["#020617", 5, 35]} />
         <ambientLight intensity={0.5} />
         
-        <StarField count={2000} />
-        
-        <AuroraRibbon color="#3b82f6" position={[0, 8, -20]} speed={0.5} />
-        <AuroraRibbon color="#8b5cf6" position={[-5, -5, -25]} speed={0.3} />
-        <AuroraRibbon color="#0ea5e9" position={[5, 0, -15]} speed={0.7} />
-
-        <Particles count={300} />
+        <CyberGrid />
+        <DataStream count={60} />
+        <StarField count={1000} />
       </Canvas>
     </div>
   );
