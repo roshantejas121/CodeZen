@@ -1,7 +1,14 @@
 import { NextResponse } from 'next/server';
 
-// Pinned, verified Piston runtimes (confirmed live 2026-04-27)
-const LANGUAGE_MAP: Record<string, { language: string; version: string }> = {
+// Judge0 Language IDs (verified 2026-04-27)
+const JUDGE0_MAP: Record<string, number> = {
+  javascript: 93, typescript: 94, python: 92, cpp: 105, java: 91,
+  rust: 108, go: 106, csharp: 51, sql: 82, ruby: 72,
+  swift: 83, kotlin: 111, php: 98, bash: 46, lua: 64, r: 99
+};
+
+// Piston Fallback Map
+const PISTON_MAP: Record<string, { language: string; version: string }> = {
   javascript: { language: 'javascript', version: '18.15.0' },
   typescript: { language: 'typescript', version: '5.0.3' },
   python:     { language: 'python',     version: '3.10.0' },
@@ -23,74 +30,59 @@ const LANGUAGE_MAP: Record<string, { language: string; version: string }> = {
 export async function POST(req: Request) {
   try {
     const { code, language } = await req.json();
-
-    const target = LANGUAGE_MAP[language];
-
-    if (!target) {
-      return NextResponse.json({ output: `Language '${language}' not supported. Supported languages: ${Object.keys(LANGUAGE_MAP).join(', ')}` });
-    }
-
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
 
-    const extMap: Record<string, string> = {
-      javascript: 'js', typescript: 'ts', python: 'py', 'c++': 'cpp', java: 'java',
-      rust: 'rs', go: 'go', ruby: 'rb', swift: 'swift', kotlin: 'kt',
-      sqlite3: 'sql', csharp: 'cs', php: 'php', bash: 'sh', lua: 'lua', rscript: 'r'
-    };
-
-    const endpoints = [
-      'https://piston.engineer/api/v2/execute',
-      'https://emkc.org/api/v2/piston/execute'
-    ];
-
-    let lastStatus = 0;
-    for (const url of endpoints) {
+    // 1. Try Judge0 CE (Primary - High Performance)
+    const judgeId = JUDGE0_MAP[language];
+    if (judgeId) {
       try {
-        const response = await fetch(url, {
+        const res = await fetch('https://ce.judge0.com/submissions?base64_encoded=false&wait=true', {
           method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-          },
-          body: JSON.stringify({
-            language: target.language,
-            version: target.version,
-            files: [{ 
-              name: `main.${extMap[target.language] || 'txt'}`,
-              content: code 
-            }],
-          }),
-          signal: controller.signal,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ source_code: code, language_id: judgeId }),
+          signal: controller.signal
         });
 
-        if (response.ok) {
-          const result = await response.json();
+        if (res.ok) {
+          const result = await res.json();
           clearTimeout(timeoutId);
-          
-          if (result.run) {
-            const stdout = result.run.stdout?.trim();
-            const stderr = result.run.stderr?.trim();
-            const output = stdout || stderr || 'Program exited with no output.';
-            return NextResponse.json({ output, hasError: !!stderr && !stdout });
-          }
+          const output = result.stdout || result.stderr || result.compile_output || 'Code executed with no output.';
+          return NextResponse.json({ output, hasError: !!(result.stderr || result.compile_output) });
         }
-        lastStatus = response.status;
       } catch (e) {
-        console.error(`Compiler fetch error for ${url}:`, e);
+        console.error('Judge0 Failure:', e);
+      }
+    }
+
+    // 2. Fallback to Piston (Secondary)
+    const target = PISTON_MAP[language];
+    if (target) {
+      const extMap: any = { javascript: 'js', typescript: 'ts', python: 'py', cpp: 'cpp', java: 'java', rust: 'rs' };
+      const response = await fetch('https://emkc.org/api/v2/piston/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0' },
+        body: JSON.stringify({
+          language: target.language,
+          version: target.version,
+          files: [{ name: `main.${extMap[language] || 'txt'}`, content: code }]
+        }),
+        signal: controller.signal
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        clearTimeout(timeoutId);
+        const output = result.run.stdout || result.run.stderr || 'Program exited with no output.';
+        return NextResponse.json({ output, hasError: !!result.run.stderr });
       }
     }
 
     clearTimeout(timeoutId);
-    return NextResponse.json({ 
-      output: `Compiler service unreachable or returned error (${lastStatus}). Please try again later.` 
-    }, { status: lastStatus || 500 });
+    return NextResponse.json({ output: 'Compiler services are currently overwhelmed. Please try again in a few seconds.' }, { status: 503 });
 
   } catch (error: any) {
-    if (error.name === 'AbortError') {
-      return NextResponse.json({ output: 'Execution timed out (12s limit). Optimize your code or check for infinite loops.' });
-    }
-    console.error('Compiler Fault:', error);
-    return NextResponse.json({ output: 'Compiler service is temporarily unavailable. Please try again.' });
+    if (error.name === 'AbortError') return NextResponse.json({ output: 'Execution timed out (12s limit).' });
+    return NextResponse.json({ output: 'Internal Compiler Fault. Please check your code syntax.' });
   }
 }
