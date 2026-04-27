@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+export const maxDuration = 60; // Extend Vercel function timeout to 60s for huge code
+export const dynamic = 'force-dynamic';
 
 // Judge0 Language IDs (verified 2026-04-27)
 const JUDGE0_MAP: Record<string, number> = {
