@@ -5,6 +5,7 @@ import { AIMentor } from "@/components/AIMentor";
 import { Toaster } from 'sonner';
 import { CommandPalette } from '@/components/CommandPalette';
 import { UserProvider } from '@/context/UserContext';
+import { Premium3DBackground } from "@/components/Premium3DBackground";
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://codezen-live-rho.vercel.app'),
@@ -21,9 +22,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body style={{ margin: 0 }}>
         <UserProvider>
+          <Premium3DBackground />
           <Toaster position="top-right" richColors />
           <CommandPalette />
-          <div className="dashboard-grid">
+          <div className="dashboard-grid" style={{ position: 'relative', zIndex: 1 }}>
             <Sidebar />
             <main className="main-content">
               {children}

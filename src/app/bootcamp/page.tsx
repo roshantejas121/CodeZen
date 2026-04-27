@@ -99,18 +99,19 @@ export default function BootcampPage() {
       </div>
 
       {/* Roadmap Phase List */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', position: 'relative' }}>
+      <div className="perspective-container" style={{ display: 'flex', flexDirection: 'column', gap: '32px', position: 'relative' }}>
         {/* Connection Line */}
         <div style={{ position: 'absolute', left: '40px', top: '40px', bottom: '40px', width: '2px', background: 'linear-gradient(180deg, var(--primary) 0%, transparent 100%)', zIndex: 0 }} />
 
         {BOOTCAMP_PHASES.map((phase, idx) => (
           <motion.div
             key={phase.id}
-            initial={{ x: -20, opacity: 0 }}
-            whileInView={{ x: 0, opacity: 1 }}
+            initial={{ x: -20, opacity: 0, rotateY: -5 }}
+            whileInView={{ x: 0, opacity: 1, rotateY: 0 }}
+            whileHover={{ scale: 1.02, rotateX: 2, translateZ: 20 }}
             viewport={{ once: true }}
-            transition={{ delay: idx * 0.1 }}
-            className="glass-card"
+            transition={{ delay: idx * 0.1, type: 'spring', stiffness: 100 }}
+            className="glass-card premium-3d-card"
             style={{ 
               marginLeft: '80px', 
               padding: '32px', 
@@ -119,7 +120,8 @@ export default function BootcampPage() {
               gap: '40px', 
               position: 'relative',
               border: '1px solid var(--card-border)',
-              background: `linear-gradient(145deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%)`
+              background: `linear-gradient(145deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%)`,
+              transformStyle: 'preserve-3d'
             }}
           >
             {/* Phase Indicator */}
