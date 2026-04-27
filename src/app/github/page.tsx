@@ -14,8 +14,8 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
-
 import { toast } from "sonner";
+import { useUser } from "@/context/UserContext";
 
 export default function GitHubHub() {
   const { user } = useUser();
