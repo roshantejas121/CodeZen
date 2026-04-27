@@ -72,28 +72,30 @@ function Particles({ count = 100 }) {
   });
 
   return (
-    {/* @ts-ignore */}
-    <points ref={mesh}>
+    <>
       {/* @ts-ignore */}
-      <bufferGeometry>
+      <points ref={mesh}>
         {/* @ts-ignore */}
-        <bufferAttribute
-          attach="attributes-position"
-          count={particles.length / 3}
-          array={particles}
-          itemSize={3}
+        <bufferGeometry>
+          {/* @ts-ignore */}
+          <bufferAttribute
+            attach="attributes-position"
+            count={particles.length / 3}
+            array={particles}
+            itemSize={3}
+          />
+        {/* @ts-ignore */}
+        </bufferGeometry>
+        {/* @ts-ignore */}
+        <pointsMaterial
+          size={0.05}
+          color="#ffffff"
+          transparent
+          opacity={0.3}
+          sizeAttenuation
         />
-      {/* @ts-ignore */}
-      </bufferGeometry>
-      {/* @ts-ignore */}
-      <pointsMaterial
-        size={0.05}
-        color="#ffffff"
-        transparent
-        opacity={0.3}
-        sizeAttenuation
-      />
-    </points>
+      </points>
+    </>
   );
 }
 
