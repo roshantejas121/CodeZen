@@ -22,13 +22,16 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
 const COMPILER_LANGUAGES = [
-  { id: 'html', name: 'HTML/CSS', icon: Globe, color: '#e34c26' },
-  { id: 'javascript', name: 'JavaScript', icon: Terminal, color: '#f7df1e' },
-  { id: 'python', name: 'Python 3', icon: Database, color: '#3776ab' },
-  { id: 'cpp', name: 'C++', icon: Cpu, color: '#00599c' },
-  { id: 'java', name: 'Java', icon: Layers, color: '#007396' },
-  { id: 'rust', name: 'Rust', icon: Zap, color: '#dea584' },
-  { id: 'go', name: 'Go', icon: Cpu, color: '#00add8' },
+  { id: 'html',       name: 'HTML/CSS',    icon: Globe,    color: '#e34c26' },
+  { id: 'javascript', name: 'JavaScript',  icon: Terminal, color: '#f7df1e' },
+  { id: 'typescript', name: 'TypeScript',  icon: Terminal, color: '#3178c6' },
+  { id: 'python',     name: 'Python 3',    icon: Database, color: '#3776ab' },
+  { id: 'cpp',        name: 'C++',         icon: Cpu,      color: '#00599c' },
+  { id: 'java',       name: 'Java',        icon: Layers,   color: '#007396' },
+  { id: 'rust',       name: 'Rust',        icon: Zap,      color: '#dea584' },
+  { id: 'go',         name: 'Go',          icon: Cpu,      color: '#00add8' },
+  { id: 'ruby',       name: 'Ruby',        icon: Zap,      color: '#cc342d' },
+  { id: 'swift',      name: 'Swift',       icon: Zap,      color: '#f05138' },
 ];
 
 interface LiveEditorProps {
@@ -97,92 +100,27 @@ export function LiveEditor({
       return;
     }
 
-    // 2. Handle JavaScript Locally
-    if (language === 'javascript') {
-      let logs: string[] = [];
-      const customConsole = {
-        log: (...args: any[]) => {
-          logs.push(args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)).join(' '));
-        },
-        error: (...args: any[]) => {
-          logs.push(`Error: ${args.join(' ')}`);
-        },
-        warn: (...args: any[]) => {
-          logs.push(`Warning: ${args.join(' ')}`);
-        }
-      };
-
-      try {
-        const runCode = new Function('console', code);
-        runCode(customConsole);
-        setOutput(logs.join('\n') || "Execution finished with no output.");
-        toast.success("Code executed! +5 XP");
-        updateXP();
-      } catch (err: any) {
-        setOutput(`Runtime Error: ${err.message}`);
-        toast.error("Runtime error detected");
-      }
-      setRunning(false);
-      return;
-    }
-
-    // 3. Handle Python Locally (Pyodide WASM)
-    if (language === 'python') {
-      try {
-        setOutput("Initializing Python Engine...");
-        // @ts-ignore
-        if (!window.pyodide) {
-          // @ts-ignore
-          window.pyodide = await loadPyodide({
-            indexURL: "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/"
-          });
-        }
-        // @ts-ignore
-        const pyodide = window.pyodide;
-        
-        // Capture stdout
-        pyodide.runPython(`
-import sys
-import io
-sys.stdout = io.StringIO()
-        `);
-        
-        await pyodide.runPythonAsync(code);
-        const stdout = pyodide.runPython("sys.stdout.getvalue()");
-        
-        setOutput(stdout || "Execution finished with no output.");
-        toast.success("Python executed! +5 XP");
-        updateXP();
-      } catch (err: any) {
-        setOutput(`Python Error: ${err.message}`);
-        toast.error("Python runtime error");
-      }
-      setRunning(false);
-      return;
-    }
-
-    // 4. Handle Other Languages via API (SQL, etc.)
+    // 2. All other languages go through the real Piston compiler
     try {
+      setOutput(`Compiling ${language}...`);
       const res = await fetch('/api/compiler', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ language, code })
       });
       const data = await res.json();
+      const output = data.output || data.error || 'No output received.';
+      setOutput(output);
       
-      if (data.output || data.stdout || data.stderr) {
-        setOutput(data.output || data.stdout || data.stderr);
-        if (data.stderr || (data.output && data.output.includes("Engine Error"))) {
-          toast.error("Execution error detected");
-        } else {
-          toast.success("Code executed! +5 XP");
-          updateXP();
-        }
+      if (data.hasError) {
+        toast.error('Runtime or compilation error detected.');
       } else {
-        setOutput(data.error || "Execution failed with no output.");
+        toast.success('Code executed! +5 XP');
+        updateXP();
       }
     } catch (err) {
-      setOutput("Connection Error: Compiler service unreachable.");
+      setOutput('Connection Error: Unable to reach the compiler service. Check your network.');
+      toast.error('Compiler unreachable');
     } finally {
       setRunning(false);
     }
