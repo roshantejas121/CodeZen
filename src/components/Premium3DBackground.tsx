@@ -56,7 +56,7 @@ function Particles({ count = 100 }) {
   const mesh = useRef<THREE.Points>(null!);
   
   const particles = useMemo(() => {
-    const temp = [];
+    const temp: number[] = [];
     for (let i = 0; i < count; i++) {
       const x = THREE.MathUtils.randFloatSpread(40);
       const y = THREE.MathUtils.randFloatSpread(40);
