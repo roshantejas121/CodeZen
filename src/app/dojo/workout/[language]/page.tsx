@@ -210,59 +210,42 @@ export default function WorkoutPage() {
       const langId = language.toLowerCase();
       const q = questions[currentQuestion];
 
-      if (langId === 'javascript') {
-        let logs: string[] = [];
-        const customConsole = {
-          log: (...args: any[]) => {
-            const str = args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ');
-            logs.push(str);
-          },
-          error: (...args: any[]) => logs.push(`Error: ${args.join(' ')}`),
-          warn: (...args: any[]) => logs.push(`Warning: ${args.join(' ')}`)
-        };
+      if (langId === 'javascript' || langId === 'python' || langId === 'c++' || langId === 'cpp' || langId === 'java') {
+        const apiLangId = langId === 'c++' ? 'cpp' : langId;
         try {
-          const runCode = new Function('console', code);
-          runCode(customConsole);
-          stdoutLog = logs.join('\n');
-          out = stdoutLog || "Execution finished with no output.";
-        } catch (e: any) {
-          out = `Runtime Error: ${e.message}`;
-        }
-      } else if (langId === 'python') {
-        try {
-          // @ts-ignore
-          if (!window.pyodide) {
-            setConsoleOutput("Initializing Python Engine (this takes a moment)...");
-            // @ts-ignore
-            window.pyodide = await window.loadPyodide({
-              indexURL: "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/"
-            });
+          const res = await fetch('/api/compiler', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ language: apiLangId, code })
+          });
+          const data = await res.json();
+          
+          if (data.hasError) {
+            out = `Runtime Error: \n${data.output}`;
+          } else {
+            stdoutLog = data.output || '';
+            out = stdoutLog || "Execution finished with no output.";
           }
-          // @ts-ignore
-          const pyodide = window.pyodide;
-          pyodide.runPython(`
-import sys
-import io
-sys.stdout = io.StringIO()
-sys.stderr = io.StringIO()
-          `);
-          await pyodide.runPythonAsync(code);
-          const stdout = pyodide.runPython("sys.stdout.getvalue()");
-          const stderr = pyodide.runPython("sys.stderr.getvalue()");
-          stdoutLog = stdout;
-          out = stdout || stderr || "Execution finished with no output.";
-        } catch (e: any) {
-          out = `Python Error: ${e.message}`;
+        } catch (err: any) {
+          out = `Connection Error: ${err.message}`;
         }
       } else {
-        // Fallback for C++/Java (Simulated Sandbox due to missing backend compilers)
-        await new Promise(resolve => setTimeout(resolve, 600));
-        if (code.includes('cout') || code.includes('System.out')) {
-          // Basic syntax check to simulate execution
-          stdoutLog = q.output; // Simulate correct output if they used print statements
-          out = stdoutLog;
-        } else {
-          out = "Compilation Error: No output detected.";
+        // Default to compiler API for any other languages that might be added
+        try {
+          const res = await fetch('/api/compiler', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ language: langId, code })
+          });
+          const data = await res.json();
+          if (data.hasError) {
+            out = `Runtime Error: \n${data.output}`;
+          } else {
+            stdoutLog = data.output || '';
+            out = stdoutLog || "Execution finished with no output.";
+          }
+        } catch (err: any) {
+          out = `Connection Error: ${err.message}`;
         }
       }
 

@@ -2,21 +2,16 @@
 
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  ArrowLeft, 
-  Code2, 
-  Play, 
-  CheckCircle2, 
-  Rocket, 
-  ExternalLink 
-} from "lucide-react";
+import { ArrowLeft, Code2, Play, CheckCircle2, Rocket, ExternalLink } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useUser } from "@/context/UserContext";
 
 export default function ProjectDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const [projectId, setProjectId] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const { awardXP } = useUser();
 
   useEffect(() => {
     params.then(p => setProjectId(p.id));
@@ -37,14 +32,8 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(`Project forked! +50 XP earned.`);
-        // Update real XP in DB
-        const userRes = await fetch('/api/user');
-        const userData = await userRes.json();
-        await fetch('/api/user', {
-          method: 'PATCH',
-          body: JSON.stringify({ xp: userData.xp + 50 })
-        });
+        toast.success('Project forked! +50 XP earned.');
+        await awardXP(50);
         window.open(data.fork_url, '_blank');
       } else {
         toast.error(data.error || "Failed to fork project");
@@ -59,6 +48,9 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
   const [showGuide, setShowGuide] = useState(false);
   const [guideLoading, setGuideLoading] = useState(false);
   const [guideSteps, setGuideSteps] = useState<string[]>([]);
+  const [githubToken, setGithubToken] = useState('');
+  const [showCloneModal, setShowCloneModal] = useState(false);
+  const [cloning, setCloning] = useState(false);
 
   const generateGuide = async () => {
     setGuideLoading(true);
@@ -68,6 +60,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
+          model: 'llama-3.3-70b-versatile',
           messages: [{ 
             role: 'user', 
             content: `Give me 5 highly technical, recommended steps to build a project called "AI Snippet Manager". Focus on architecture, tools, and code implementation.` 
@@ -75,13 +68,51 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
         })
       });
       const data = await res.json();
-      // Split the AI response into steps
-      const steps = data.content.split('\n').filter((s: string) => s.trim().length > 10).slice(0, 5);
-      setGuideSteps(steps);
+      
+      if (data.content.includes("technical difficulties") || data.content.includes("trouble thinking")) {
+        setGuideSteps(["1. Ensure you have set your GROQ_API_KEY in the .env file.", "2. Initialize your Next.js frontend with Tailwind CSS.", "3. Set up Prisma with SQLite for local vector storage.", "4. Integrate the Google Gemini or Groq API for snippet tagging.", "5. Implement search indexing with exact matching algorithms."]);
+      } else {
+        const steps = data.content.split('\n').filter((s: string) => s.trim().length > 10).slice(0, 5);
+        setGuideSteps(steps);
+      }
     } catch (err) {
       setGuideSteps(["Error generating guide. Please check your connection."]);
     } finally {
       setGuideLoading(false);
+    }
+  };
+
+  const handleClone = async () => {
+    if (!githubToken.trim()) return toast.error("Please enter your GitHub Token");
+    setCloning(true);
+    try {
+      const res = await fetch('/api/github/clone', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: githubToken.trim(),
+          repoName: 'codezen-ai-snippet-manager',
+          description: 'AI Snippet Manager created with CodeZen',
+          files: [
+            { path: 'package.json', content: '{\n  "name": "ai-snippet-manager",\n  "private": true\n}\n' },
+            { path: 'README.md', content: '# AI Snippet Manager\\n\\nCreated via CodeZen.\\n\\n## Roadmap\\n' + guideSteps.join('\\n') }
+          ]
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(`Cloned to ${data.owner}/${data.repoName}! +50 XP earned.`);
+        await awardXP(50);
+        setShowCloneModal(false);
+        setShowGuide(false);
+        window.open(data.repoUrl, '_blank');
+      } else {
+        toast.error(data.error || 'Failed to clone repository');
+      }
+    } catch (err) {
+      toast.error('Network error during clone');
+    } finally {
+      setCloning(false);
     }
   };
 
@@ -132,16 +163,38 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
 
               {!guideLoading && (
                 <button 
-                  onClick={() => {
-                    // Deep link to VS Code (standard protocol)
-                    toast.success("Launching VS Code...");
-                    setShowGuide(false);
-                  }}
-                  style={{ width: '100%', background: 'var(--primary)', color: 'white', border: 'none', padding: '14px', borderRadius: '10px', fontWeight: 700, marginTop: '32px', cursor: 'pointer' }}
+                  onClick={() => setShowCloneModal(true)}
+                  style={{ width: '100%', background: 'var(--primary)', color: 'white', border: 'none', padding: '14px', borderRadius: '10px', fontWeight: 700, marginTop: '32px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                 >
-                  Open in VS Code
+                  <FaGithub size={18} /> Clone Scaffold to My GitHub
                 </button>
               )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showCloneModal && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="glass-card" style={{ maxWidth: '400px', width: '100%' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: 800, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}><FaGithub size={24} /> GitHub Authorization</h2>
+              <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '24px', lineHeight: 1.5 }}>
+                To create the scaffolding repository directly in your account, please provide a GitHub Personal Access Token (classic) with `repo` scopes.
+              </p>
+              <input 
+                type="password"
+                placeholder="ghp_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+                value={githubToken}
+                onChange={e => setGithubToken(e.target.value)}
+                style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--card-border)', borderRadius: '8px', color: 'white', marginBottom: '20px', fontFamily: 'monospace' }}
+              />
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button onClick={() => setShowCloneModal(false)} style={{ flex: 1, background: 'rgba(255,255,255,0.1)', border: 'none', padding: '12px', borderRadius: '8px', color: 'white', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
+                <button onClick={handleClone} disabled={cloning} className="bg-gradient" style={{ flex: 1, border: 'none', padding: '12px', borderRadius: '8px', color: 'white', fontWeight: 700, cursor: cloning ? 'not-allowed' : 'pointer', opacity: cloning ? 0.7 : 1 }}>
+                  {cloning ? 'Cloning...' : 'Start Clone'}
+                </button>
+              </div>
             </motion.div>
           </div>
         )}
@@ -251,17 +304,8 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                     // In a production app, we would fetch the repo contents and send to /api/chat/audit
                     await new Promise(r => setTimeout(r, 2000));
                     
-                    const userRes = await fetch('/api/user');
-                    const userData = await userRes.json();
-                    
-                    await fetch('/api/user', {
-                      method: 'PATCH',
-                      body: JSON.stringify({ 
-                        xp: (userData.xp || 0) + 800,
-                        lastProject: "AI Snippet Manager",
-                        verified: true 
-                      })
-                    });
+                    await awardXP(800);
+                    await fetch('/api/user', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ lastProject: 'AI Snippet Manager', verified: true }) });
                     
                     const confetti = (await import('canvas-confetti')).default;
                     confetti({

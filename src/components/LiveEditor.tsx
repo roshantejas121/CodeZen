@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { Editor } from "@monaco-editor/react";
+import { useUser } from "@/context/UserContext";
 
 const COMPILER_LANGUAGES = [
   { id: 'html',       name: 'HTML/CSS',    icon: Globe,    color: '#e34c26' },
@@ -28,10 +30,15 @@ const COMPILER_LANGUAGES = [
   { id: 'python',     name: 'Python 3',    icon: Database, color: '#3776ab' },
   { id: 'cpp',        name: 'C++',         icon: Cpu,      color: '#00599c' },
   { id: 'java',       name: 'Java',        icon: Layers,   color: '#007396' },
+  { id: 'csharp',     name: 'C#',          icon: Layers,   color: '#239120' },
   { id: 'rust',       name: 'Rust',        icon: Zap,      color: '#dea584' },
   { id: 'go',         name: 'Go',          icon: Cpu,      color: '#00add8' },
   { id: 'ruby',       name: 'Ruby',        icon: Zap,      color: '#cc342d' },
   { id: 'swift',      name: 'Swift',       icon: Zap,      color: '#f05138' },
+  { id: 'kotlin',     name: 'Kotlin',      icon: Zap,      color: '#0095d5' },
+  { id: 'php',        name: 'PHP',         icon: Globe,    color: '#777bb4' },
+  { id: 'bash',       name: 'Bash',        icon: Terminal, color: '#4EAA25' },
+  { id: 'lua',        name: 'Lua',         icon: Zap,      color: '#000080' },
 ];
 
 interface LiveEditorProps {
@@ -53,6 +60,7 @@ export function LiveEditor({
   const [srcDoc, setSrcDoc] = useState("");
   const [output, setOutput] = useState("");
   const [running, setRunning] = useState(false);
+  const { awardXP } = useUser();
 
   useEffect(() => {
     setMounted(true);
@@ -62,15 +70,9 @@ export function LiveEditor({
     if (initialLanguage === 'html') setSrcDoc(initialCode);
   }, [initialCode, initialLanguage]);
 
-  const updateXP = async () => {
+  const updateXP = async (amount = 5) => {
     try {
-      const userRes = await fetch('/api/user');
-      const userData = await userRes.json();
-      await fetch('/api/user', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ xp: (userData.xp || 0) + 5 })
-      });
+      await awardXP(amount);
     } catch (err) {
       console.error("Failed to update XP:", err);
     }
@@ -146,7 +148,7 @@ export function LiveEditor({
   const isWebMode = language === 'html' || language === 'css';
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '650px', borderRadius: '16px', overflow: 'hidden', border: '1px solid var(--card-border)', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }}>
+    <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', height: '650px', padding: 0, borderRadius: '20px', overflow: 'hidden', border: '1px solid var(--card-border)', boxShadow: '0 30px 60px rgba(0,0,0,0.5), 0 0 20px var(--primary-glow)' }}>
       
       {/* Quick Access Language Bar (Programiz Style) */}
       {!hideSelector && (
@@ -238,22 +240,19 @@ export function LiveEditor({
         
         {/* Top Pane: High-Performance Editor */}
         <div style={{ flex: 1, position: 'relative', borderBottom: '1px solid #1e293b' }}>
-          <textarea
+          <Editor
+            height="100%"
+            language={language === 'csharp' ? 'csharp' : language === 'cpp' ? 'cpp' : language}
+            theme="vs-dark"
             value={code}
-            onChange={(e) => setCode(e.target.value)}
-            spellCheck="false"
-            style={{
-              width: '100%',
-              height: '100%',
-              background: 'transparent',
-              color: '#f8fafc',
-              border: 'none',
-              padding: '24px',
+            onChange={(val) => setCode(val || '')}
+            options={{
+              minimap: { enabled: false },
+              fontSize: 14,
               fontFamily: '"Fira Code", monospace',
-              fontSize: '15px',
-              lineHeight: 1.6,
-              outline: 'none',
-              resize: 'none'
+              scrollBeyondLastLine: false,
+              roundedSelection: false,
+              padding: { top: 16 }
             }}
           />
         </div>

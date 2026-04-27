@@ -13,6 +13,11 @@ const LANGUAGE_MAP: Record<string, { language: string; version: string }> = {
   swift:      { language: 'swift',      version: '5.3.3' },
   kotlin:     { language: 'kotlin',     version: '1.8.20' },
   sql:        { language: 'sqlite3',    version: '3.36.0' },
+  csharp:     { language: 'csharp',     version: '6.12.0' },
+  php:        { language: 'php',        version: '8.2.3' },
+  bash:       { language: 'bash',       version: '5.2.0' },
+  lua:        { language: 'lua',        version: '5.4.4' },
+  r:          { language: 'r',          version: '4.1.1' },
 };
 
 export async function POST(req: Request) {
@@ -22,7 +27,7 @@ export async function POST(req: Request) {
     const target = LANGUAGE_MAP[language];
 
     if (!target) {
-      return NextResponse.json({ output: 'Language not supported. Try JavaScript, Python, C++, Java, Rust, Go, or TypeScript.' });
+      return NextResponse.json({ output: `Language '${language}' not supported. Supported languages: ${Object.keys(LANGUAGE_MAP).join(', ')}` });
     }
 
     const controller = new AbortController();

@@ -14,12 +14,21 @@ import {
 export function AIMentor() {
   const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [model, setModel] = useState('llama-3.3-70b-versatile');
   const [messages, setMessages] = useState([
     { role: 'assistant', content: 'Hi there! I\'m your AI Mentor. How can I help you level up today? I can debug code, explain concepts, or help you with your roadmap.' }
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const AVAILABLE_MODELS = [
+    { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B' },
+    { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B' },
+    { id: 'mixtral-8x7b-32768', name: 'Mixtral 8x7B' },
+    { id: 'gemma2-9b-it', name: 'Gemma 2 9B' },
+    { id: 'deepseek-r1-distill-llama-70b', name: 'DeepSeek R1 70B' }
+  ];
 
   useEffect(() => {
     setMounted(true);
@@ -44,7 +53,7 @@ export function AIMentor() {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: updatedMessages })
+        body: JSON.stringify({ messages: updatedMessages, model })
       });
       const data = await res.json();
       setMessages(prev => [...prev, { 
@@ -67,40 +76,43 @@ export function AIMentor() {
     <>
       {/* Floating Button */}
       <motion.button
-        whileHover={{ scale: 1.1 }}
+        whileHover={{ scale: 1.1, rotate: 180 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setIsOpen(true)}
-        className="bg-gradient"
+        className="animate-pulse-glow"
         style={{
           position: 'fixed',
-          bottom: '32px',
-          right: '32px',
-          width: '64px',
-          height: '64px',
-          borderRadius: '20px',
-          border: 'none',
+          bottom: '40px',
+          right: '40px',
+          width: '72px',
+          height: '72px',
+          borderRadius: '50%',
+          border: '2px solid rgba(255,255,255,0.4)',
           color: 'white',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 20px 40px rgba(59, 130, 246, 0.4)',
+          boxShadow: '0 0 40px var(--primary-glow), inset 0 0 20px rgba(255,255,255,0.6)',
           cursor: 'pointer',
-          zIndex: 1000
+          zIndex: 1000,
+          background: 'radial-gradient(circle at 30% 30%, #a855f7 0%, #3b82f6 100%)',
+          transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
         }}
       >
-        <Bot size={32} />
+        <Sparkles size={32} style={{ filter: 'drop-shadow(0 0 8px white)' }} />
         <motion.div
-          animate={{ scale: [1, 1.2, 1] }}
+          animate={{ scale: [1, 1.3, 1], opacity: [0.5, 1, 0.5] }}
           transition={{ repeat: Infinity, duration: 2 }}
           style={{
             position: 'absolute',
-            top: '-4px',
-            right: '-4px',
-            width: '12px',
-            height: '12px',
+            top: '0px',
+            right: '0px',
+            width: '16px',
+            height: '16px',
             background: '#10b981',
             borderRadius: '50%',
-            border: '2px solid var(--bg-color)'
+            border: '3px solid var(--bg-color)',
+            boxShadow: '0 0 10px #10b981'
           }}
         />
       </motion.button>
@@ -136,7 +148,29 @@ export function AIMentor() {
                   <div style={{ fontSize: '11px', opacity: 0.8 }}>Online & ready to help</div>
                 </div>
               </div>
-              <X size={20} style={{ cursor: 'pointer' }} onClick={() => setIsOpen(false)} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <select
+                  value={model}
+                  onChange={(e) => setModel(e.target.value)}
+                  style={{
+                    background: 'rgba(0,0,0,0.2)',
+                    color: 'white',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    borderRadius: '6px',
+                    padding: '4px 8px',
+                    fontSize: '11px',
+                    outline: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {AVAILABLE_MODELS.map(m => (
+                    <option key={m.id} value={m.id} style={{ background: '#1e293b' }}>
+                      {m.name}
+                    </option>
+                  ))}
+                </select>
+                <X size={20} style={{ cursor: 'pointer' }} onClick={() => setIsOpen(false)} />
+              </div>
             </div>
 
             {/* Messages */}
