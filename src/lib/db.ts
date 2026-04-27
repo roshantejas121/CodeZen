@@ -91,6 +91,19 @@ const INITIAL_DATA = {
   academy: [
     { id: 'html',       name: 'HTML/CSS',   category: 'Frontend', title: 'HTML5 Modern Standard', chapters: [{ id: 'html-intro', title: 'HTML Introduction', desc: "Standard markup language for Web pages.", fact: "HTML stands for Hyper Text Markup Language.", code: "<h1>Hello World</h1>" }] },
     { id: 'javascript', name: 'JavaScript', category: 'Frontend', title: 'JavaScript ES6+',       chapters: [{ id: 'js-intro',   title: 'JS Introduction',   desc: "World's most popular language.",          fact: "JavaScript is the language of the Web.",      code: "console.log('Hello World');" }] },
+    { id: 'typescript', name: 'TypeScript', category: 'Frontend', title: 'TypeScript Basics',     chapters: [{ id: 'ts-intro',   title: 'TS Introduction',   desc: "Typed superset of JavaScript.",           fact: "TypeScript transpiles to plain JavaScript.",  code: "let msg: string = 'Hello World';\nconsole.log(msg);" }] },
+    { id: 'python',     name: 'Python 3',   category: 'Backend',  title: 'Python Data Science',   chapters: [{ id: 'py-intro',   title: 'Python Introduction', desc: "Highly readable and versatile.",        fact: "Python was named after Monty Python.",        code: "print('Hello World')" }] },
+    { id: 'cpp',        name: 'C++',        category: 'Systems',  title: 'C++ Systems',           chapters: [{ id: 'cpp-intro',  title: 'C++ Introduction',  desc: "High-performance systems programming.",   fact: "C++ was designed as an extension of C.",      code: "#include <iostream>\n\nint main() {\n  std::cout << \"Hello World\";\n  return 0;\n}" }] },
+    { id: 'java',       name: 'Java',       category: 'Backend',  title: 'Enterprise Java',       chapters: [{ id: 'java-intro', title: 'Java Introduction', desc: "Write once, run anywhere.",             fact: "Java originally had the name Oak.",           code: "public class Main {\n  public static void main(String[] args) {\n    System.out.println(\"Hello World\");\n  }\n}" }] },
+    { id: 'csharp',     name: 'C#',         category: 'Backend',  title: 'C# .NET',               chapters: [{ id: 'cs-intro',   title: 'C# Introduction',   desc: "Microsoft's powerful enterprise language.", fact: "C# was originally named Cool.",         code: "using System;\n\nclass Program {\n  static void Main() {\n    Console.WriteLine(\"Hello World\");\n  }\n}" }] },
+    { id: 'rust',       name: 'Rust',       category: 'Systems',  title: 'Rust Safety',           chapters: [{ id: 'rs-intro',   title: 'Rust Introduction', desc: "Memory safety without garbage collection.", fact: "Rust guarantees thread safety.",            code: "fn main() {\n  println!(\"Hello World\");\n}" }] },
+    { id: 'go',         name: 'Go',         category: 'Backend',  title: 'Go Concurrency',        chapters: [{ id: 'go-intro',   title: 'Go Introduction',   desc: "Fast, reliable, and efficient.",          fact: "Go was designed at Google.",                  code: "package main\n\nimport \"fmt\"\n\nfunc main() {\n  fmt.Println(\"Hello World\")\n}" }] },
+    { id: 'ruby',       name: 'Ruby',       category: 'Backend',  title: 'Ruby on Rails',         chapters: [{ id: 'rb-intro',   title: 'Ruby Introduction', desc: "A programmer's best friend.",             fact: "Ruby was designed to make programming fun.",  code: "puts 'Hello World'" }] },
+    { id: 'swift',      name: 'Swift',      category: 'Mobile',   title: 'Swift iOS',             chapters: [{ id: 'sw-intro',   title: 'Swift Introduction',desc: "Apple's modern programming language.",    fact: "Swift is fast, safe, and expressive.",        code: "print(\"Hello World\")" }] },
+    { id: 'kotlin',     name: 'Kotlin',     category: 'Mobile',   title: 'Kotlin Android',        chapters: [{ id: 'kt-intro',   title: 'Kotlin Introduction',desc: "Modern Android development.",            fact: "Kotlin is fully interoperable with Java.",    code: "fun main() {\n  println(\"Hello World\")\n}" }] },
+    { id: 'php',        name: 'PHP',        category: 'Backend',  title: 'PHP Web',               chapters: [{ id: 'php-intro',  title: 'PHP Introduction',  desc: "Server-side scripting language.",         fact: "PHP powers over 70% of the web.",             code: "<?php\necho 'Hello World';\n?>" }] },
+    { id: 'bash',       name: 'Bash',       category: 'Systems',  title: 'Bash Scripting',        chapters: [{ id: 'bash-intro', title: 'Bash Introduction', desc: "The GNU Project's shell.",              fact: "Bash stands for Bourne Again SHell.",         code: "echo 'Hello World'" }] },
+    { id: 'lua',        name: 'Lua',        category: 'GameDev',  title: 'Lua Scripting',         chapters: [{ id: 'lua-intro',  title: 'Lua Introduction',  desc: "Lightweight scripting language.",         fact: "Lua means Moon in Portuguese.",               code: "print('Hello World')" }] },
   ],
   reviews:      [],
   mentorships:  [],
@@ -120,6 +133,7 @@ export const db = {
       echoHints:   existing.echoHints   || INITIAL_DATA.echoHints,
       squads:      existing.squads      || INITIAL_DATA.squads,
       projects:    existing.projects    || INITIAL_DATA.projects,
+      academy:     INITIAL_DATA.academy,
     };
   },
 
