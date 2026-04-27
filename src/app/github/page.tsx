@@ -47,7 +47,6 @@ export default function GitHubHub() {
       'Accept': 'application/vnd.github.v3+json'
     };
     
-    // Use the public access token if available, or just hit the public search API
     try {
       const res = await fetch(`https://api.github.com/search/repositories?q=${searchQuery}+stars:>1000&sort=stars&order=desc`);
       const data = await res.json();
@@ -55,20 +54,39 @@ export default function GitHubHub() {
       if (data.items && data.items.length > 0) {
         setRepos(data.items.slice(0, 8));
       } else {
-        // Fallback to high-quality curated repos if API fails/rate-limits
-        setRepos([
-          { id: 1, name: 'next.js', description: 'The React Framework for the Web', stargazers_count: 120000, forks_count: 25000, language: 'TypeScript', html_url: 'https://github.com/vercel/next.js' },
-          { id: 2, name: 'react', description: 'The library for web and native user interfaces', stargazers_count: 220000, forks_count: 45000, language: 'JavaScript', html_url: 'https://github.com/facebook/react' },
-          { id: 3, name: 'typescript', description: 'TypeScript is a superset of JavaScript that compiles to clean JavaScript output.', stargazers_count: 98000, forks_count: 12000, language: 'TypeScript', html_url: 'https://github.com/microsoft/TypeScript' },
-          { id: 4, name: 'rust', description: 'Empowering everyone to build reliable and efficient software.', stargazers_count: 95000, forks_count: 11000, language: 'Rust', html_url: 'https://github.com/rust-lang/rust' },
-        ]);
+        // Dynamic Fallback based on topic
+        const lowerQuery = searchQuery.toLowerCase();
+        let curated = [];
+        
+        if (lowerQuery.includes('ai') || lowerQuery.includes('llm')) {
+          curated = [
+            { id: 'ai1', name: 'transformers', description: 'State-of-the-art Machine Learning for Pytorch, TensorFlow, and JAX.', stargazers_count: 115000, forks_count: 22000, language: 'Python', html_url: 'https://github.com/huggingface/transformers' },
+            { id: 'ai2', name: 'langchain', description: 'Building applications with LLMs through composability.', stargazers_count: 65000, forks_count: 8500, language: 'TypeScript', html_url: 'https://github.com/langchain-ai/langchain' },
+            { id: 'ai3', name: 'auto-gpt', description: 'An experimental open-source attempt to make GPT-4 fully autonomous.', stargazers_count: 145000, forks_count: 32000, language: 'Python', html_url: 'https://github.com/Significant-Gravitas/Auto-GPT' },
+          ];
+        } else if (lowerQuery.includes('web3') || lowerQuery.includes('blockchain')) {
+          curated = [
+            { id: 'w1', name: 'solidity', description: 'The Solidity Smart Contract programming language.', stargazers_count: 22000, forks_count: 5000, language: 'C++', html_url: 'https://github.com/ethereum/solidity' },
+            { id: 'w2', name: 'hardhat', description: 'Ethereum development environment for professionals.', stargazers_count: 15000, forks_count: 3000, language: 'TypeScript', html_url: 'https://github.com/NomicFoundation/hardhat' },
+          ];
+        } else if (lowerQuery.includes('rust')) {
+          curated = [
+            { id: 'r1', name: 'rust', description: 'Empowering everyone to build reliable and efficient software.', stargazers_count: 95000, forks_count: 11000, language: 'Rust', html_url: 'https://github.com/rust-lang/rust' },
+            { id: 'r2', name: 'tokio', description: 'A runtime for writing reliable, asynchronous, and slim applications with Rust.', stargazers_count: 22000, forks_count: 2500, language: 'Rust', html_url: 'https://github.com/tokio-rs/tokio' },
+          ];
+        } else {
+          curated = [
+            { id: 'd1', name: 'next.js', description: 'The React Framework for the Web', stargazers_count: 120000, forks_count: 25000, language: 'TypeScript', html_url: 'https://github.com/vercel/next.js' },
+            { id: 'd2', name: 'react', description: 'The library for web and native user interfaces', stargazers_count: 220000, forks_count: 45000, language: 'JavaScript', html_url: 'https://github.com/facebook/react' },
+            { id: 'd3', name: 'typescript', description: 'TypeScript is a superset of JavaScript that compiles to clean JavaScript output.', stargazers_count: 98000, forks_count: 12000, language: 'TypeScript', html_url: 'https://github.com/microsoft/TypeScript' },
+          ];
+        }
+        setRepos(curated);
       }
     } catch (err) {
       console.error("GitHub Fetch Error:", err);
-      // Fail gracefully with demo data
       setRepos([
-        { id: 1, name: 'next.js', description: 'The React Framework for the Web', stargazers_count: 120000, forks_count: 25000, language: 'TypeScript', html_url: 'https://github.com/vercel/next.js' },
-        { id: 2, name: 'react', description: 'The library for web and native user interfaces', stargazers_count: 220000, forks_count: 45000, language: 'JavaScript', html_url: 'https://github.com/facebook/react' },
+        { id: 'e1', name: 'next.js', description: 'The React Framework for the Web', stargazers_count: 120000, forks_count: 25000, language: 'TypeScript', html_url: 'https://github.com/vercel/next.js' },
       ]);
     } finally {
       setLoading(false);
