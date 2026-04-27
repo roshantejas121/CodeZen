@@ -39,7 +39,11 @@ export async function POST(req: Request) {
       try {
         const res = await fetch('https://ce.judge0.com/submissions?base64_encoded=false&wait=true', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Referer': 'https://devgrowth-beta.vercel.app'
+          },
           body: JSON.stringify({ source_code: code, language_id: judgeId }),
           signal: controller.signal
         });
@@ -50,31 +54,48 @@ export async function POST(req: Request) {
           const output = result.stdout || result.stderr || result.compile_output || 'Code executed with no output.';
           return NextResponse.json({ output, hasError: !!(result.stderr || result.compile_output) });
         }
+        lastStatus = res.status;
       } catch (e) {
         console.error('Judge0 Failure:', e);
       }
     }
 
-    // 2. Fallback to Piston (Secondary)
+    // 2. Fallback to Piston Mirrors
     const target = PISTON_MAP[language];
     if (target) {
-      const extMap: any = { javascript: 'js', typescript: 'ts', python: 'py', cpp: 'cpp', java: 'java', rust: 'rs' };
-      const response = await fetch('https://emkc.org/api/v2/piston/execute', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0' },
-        body: JSON.stringify({
-          language: target.language,
-          version: target.version,
-          files: [{ name: `main.${extMap[language] || 'txt'}`, content: code }]
-        }),
-        signal: controller.signal
-      });
+      const mirrors = [
+        'https://piston.engineer/api/v2/execute',
+        'https://emkc.org/api/v2/piston/execute',
+        'https://piston.piston.engineer/api/v2/execute'
+      ];
 
-      if (response.ok) {
-        const result = await response.json();
-        clearTimeout(timeoutId);
-        const output = result.run.stdout || result.run.stderr || 'Program exited with no output.';
-        return NextResponse.json({ output, hasError: !!result.run.stderr });
+      for (const url of mirrors) {
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+              'Referer': 'https://devgrowth-beta.vercel.app'
+            },
+            body: JSON.stringify({
+              language: target.language,
+              version: target.version,
+              files: [{ name: `main.txt`, content: code }]
+            }),
+            signal: controller.signal
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            clearTimeout(timeoutId);
+            const output = result.run.stdout || result.run.stderr || 'Program exited with no output.';
+            return NextResponse.json({ output, hasError: !!result.run.stderr });
+          }
+          lastStatus = response.status;
+        } catch (e) {
+          console.error(`Piston Mirror Failure (${url}):`, e);
+        }
       }
     }
 
