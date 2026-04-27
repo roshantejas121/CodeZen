@@ -38,7 +38,7 @@ export async function POST(req: Request) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         language: target.language,
-        version: target.version,
+        version: "*", // Using * guarantees the latest real compiler version is used
         files: [{ content: code }],
       }),
       signal: controller.signal,
