@@ -191,6 +191,29 @@ export default function AcademyPage() {
                     ))}
                   </div>
 
+                  {selectedChapter?.videoUrl && (
+                    <div style={{ 
+                      width: '100%', 
+                      aspectRatio: '16/9', 
+                      background: '#000', 
+                      borderRadius: '16px', 
+                      overflow: 'hidden', 
+                      marginBottom: '40px',
+                      border: '1px solid var(--card-border)',
+                      boxShadow: '0 20px 40px rgba(0,0,0,0.3)'
+                    }}>
+                      <iframe 
+                        width="100%" 
+                        height="100%" 
+                        src={selectedChapter.videoUrl} 
+                        title="YouTube video player" 
+                        frameBorder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        allowFullScreen
+                      />
+                    </div>
+                  )}
+
                   <div style={{ 
                     padding: '24px', 
                     background: 'rgba(59, 130, 246, 0.03)', 
