@@ -41,10 +41,19 @@ export default function AcademyPage() {
       case 'html': return '#e34c26';
       case 'css': return '#264de4';
       case 'javascript': return '#f7df1e';
+      case 'typescript': return '#3178c6';
       case 'python': return '#3776ab';
       case 'cpp': return '#00599c';
       case 'java': return '#007396';
+      case 'csharp': return '#239120';
       case 'rust': return '#dea584';
+      case 'go': return '#00add8';
+      case 'ruby': return '#cc342d';
+      case 'swift': return '#f05138';
+      case 'kotlin': return '#0095d5';
+      case 'php': return '#777bb4';
+      case 'bash': return '#4EAA25';
+      case 'lua': return '#000080';
       default: return 'var(--primary)';
     }
   };

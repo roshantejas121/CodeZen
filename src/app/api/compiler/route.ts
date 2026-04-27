@@ -17,7 +17,7 @@ const LANGUAGE_MAP: Record<string, { language: string; version: string }> = {
   php:        { language: 'php',        version: '8.2.3' },
   bash:       { language: 'bash',       version: '5.2.0' },
   lua:        { language: 'lua',        version: '5.4.4' },
-  r:          { language: 'r',          version: '4.1.1' },
+  r:          { language: 'rscript',    version: '4.1.1' },
 };
 
 export async function POST(req: Request) {
@@ -33,13 +33,25 @@ export async function POST(req: Request) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s timeout
 
+    const extMap: Record<string, string> = {
+      javascript: 'js', typescript: 'ts', python: 'py', 'c++': 'cpp', java: 'java',
+      rust: 'rs', go: 'go', ruby: 'rb', swift: 'swift', kotlin: 'kt',
+      sqlite3: 'sql', csharp: 'cs', php: 'php', bash: 'sh', lua: 'lua', rscript: 'r'
+    };
+
     const response = await fetch('https://emkc.org/api/v2/piston/execute', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'User-Agent': 'CodeZen-DevGrowth/1.0'
+      },
       body: JSON.stringify({
         language: target.language,
-        version: "*", // Using * guarantees the latest real compiler version is used
-        files: [{ content: code }],
+        version: target.version,
+        files: [{ 
+          name: `main.${extMap[target.language] || 'txt'}`,
+          content: code 
+        }],
       }),
       signal: controller.signal,
     });
