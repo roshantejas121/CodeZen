@@ -18,7 +18,7 @@ export default function LeaderboardPage() {
 
   if (!mounted) return null;
 
-  const beltOrder = ["White", "Yellow", "Green", "Blue", "Brown", "Black", "Red"];
+  const beltOrder = ["White", "Yellow", "Orange", "Green", "Blue", "Black"];
 
   const sortedLeaderboard = [...leaderboard].sort((a, b) => {
     if (rankBy === 'xp') return b.xp - a.xp;
@@ -34,11 +34,10 @@ export default function LeaderboardPage() {
     switch (belt) {
       case "White": return "#ffffff";
       case "Yellow": return "#facc15";
+      case "Orange": return "#f97316";
       case "Green": return "#22c55e";
       case "Blue": return "#3b82f6";
-      case "Brown": return "#78350f";
       case "Black": return "#111827";
-      case "Red": return "#ef4444";
       default: return "var(--primary)";
     }
   };

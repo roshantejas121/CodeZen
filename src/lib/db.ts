@@ -433,5 +433,16 @@ export const db = {
     data.user.certifications.push(cert);
     db.write(data);
     return cert;
+  },
+
+  getHighestBelt: (user: any) => {
+    if (!user.certifications || user.certifications.length === 0) return "White";
+    const beltOrder = ["White", "Yellow", "Orange", "Green", "Blue", "Black"];
+    let highestIdx = 0;
+    user.certifications.forEach((cert: any) => {
+      const idx = beltOrder.indexOf(cert.belt);
+      if (idx > highestIdx) highestIdx = idx;
+    });
+    return beltOrder[highestIdx];
   }
 };

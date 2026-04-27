@@ -6,12 +6,15 @@ export async function GET() {
     const data = db.read();
     // In a real app, you'd fetch all users and sort by XP
     // For now, we'll return our user plus some competitors
+    const userBelt = db.getHighestBelt(data.user);
+    
     const leaderboard = [
-      { name: "Alex Rivers", xp: 15200, belt: "Black", rank: 1 },
-      { name: "Sarah Chen", xp: 14850, belt: "Brown", rank: 2 },
-      { name: data.user.name, xp: data.user.xp, belt: "Blue", rank: 3 },
-      { name: "Michael Park", xp: 11200, belt: "Green", rank: 4 },
-      { name: "Jessica Wu", xp: 9500, belt: "Yellow", rank: 5 },
+      { name: "Linus Torvalds", xp: 99999, belt: "Black", rank: 1 },
+      { name: "Guido van Rossum", xp: 41000, belt: "Black", rank: 2 },
+      { name: "Yukihiro Matsumoto", xp: 32000, belt: "Blue", rank: 3 },
+      { name: data.user.name || 'Developer', xp: data.user.xp, belt: userBelt, rank: 4 },
+      { name: "Sarah Connor", xp: 4500, belt: "Yellow", rank: 5 },
+      { name: "Ada Lovelace", xp: 1200, belt: "White", rank: 6 },
     ].sort((a, b) => b.xp - a.xp);
 
     return NextResponse.json(leaderboard);
