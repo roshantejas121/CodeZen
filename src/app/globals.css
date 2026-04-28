@@ -28,7 +28,7 @@
 }
 
 body {
-  background-color: var(--bg-color);
+  background-color: transparent;
   color: var(--text-main);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   min-height: 100vh;

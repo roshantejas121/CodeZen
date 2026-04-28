@@ -143,7 +143,7 @@ export function Premium3DBackground() {
     <div style={{ 
       position: 'fixed', 
       top: 0, left: 0, width: '100vw', height: '100vh', 
-      zIndex: -1, pointerEvents: 'auto',
+      zIndex: 0, pointerEvents: 'auto',
       background: '#020617' 
     }}>
       <Canvas camera={{ position: [0, 0, 15], fov: 45 }}>
