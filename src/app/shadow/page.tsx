@@ -92,12 +92,28 @@ export default function ShadowDrillsPage() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionStep, setSubmissionStep] = useState("");
+
   const handleVerify = () => {
-    toast.loading("Simulating high-load stress test...");
+    setIsSubmitting(true);
+    
+    setSubmissionStep("Running stress tests...");
     setTimeout(() => {
-      setIsCompleted(true);
-      toast.success("Critical Infrastructure Patched! +3500 XP");
-    }, 2500);
+      setSubmissionStep("Performing security audit...");
+      setTimeout(() => {
+        setSubmissionStep("Syncing to Global Portfolio...");
+        setTimeout(() => {
+          setIsCompleted(true);
+          setIsSubmitting(false);
+          setSubmissionStep("");
+          toast.success("Critical Infrastructure Patched & Uploaded to Portfolio!");
+          
+          // Logic to 'persist' this to the user's global portfolio would go here
+          // For now we simulate the automated integration
+        }, 2000);
+      }, 1500);
+    }, 1500);
   };
 
   return (
@@ -109,9 +125,19 @@ export default function ShadowDrillsPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: '#ef4444', marginBottom: '8px' }}>
             <Activity size={24} className="animate-pulse" />
             <span style={{ fontSize: '12px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '3px' }}>Global Threat Level: High</span>
+            <div style={{ marginLeft: '20px', padding: '2px 10px', borderRadius: '40px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', fontSize: '10px', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden', whiteSpace: 'nowrap', width: '300px' }}>
+              <span style={{ fontWeight: 900 }}>INTAKE:</span>
+              <motion.div 
+                animate={{ x: [-300, 300] }}
+                transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                style={{ fontWeight: 600 }}
+              >
+                New critical vulnerability detected in AWS Lambda middleware... Analyzing for Shadow Ops...
+              </motion.div>
+            </div>
           </div>
           <h1 style={{ fontSize: '42px', fontWeight: 900, letterSpacing: '-1px' }}>Shadow Ops <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '24px' }}>/ terminal v4.2</span></h1>
-          <p style={{ color: 'var(--text-muted)', marginTop: '8px', fontSize: '16px' }}>Intercepting and patching live global vulnerabilities in real-time.</p>
+          <p style={{ color: 'var(--text-muted)', marginTop: '8px', fontSize: '16px' }}>Automated problem discovery & global portfolio integration active.</p>
         </div>
 
         <div style={{ display: 'flex', gap: '20px' }}>
@@ -176,11 +202,26 @@ export default function ShadowDrillsPage() {
 
           <button 
             onClick={handleVerify}
+            disabled={isSubmitting || isCompleted}
             className="bg-gradient" 
-            style={{ width: '100%', padding: '24px', borderRadius: '18px', border: 'none', color: 'white', fontWeight: 900, fontSize: '18px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', boxShadow: '0 20px 40px rgba(239, 68, 68, 0.2)' }}
+            style={{ 
+              width: '100%', padding: '24px', borderRadius: '18px', border: 'none', color: 'white', fontWeight: 900, fontSize: '18px', 
+              cursor: (isSubmitting || isCompleted) ? 'not-allowed' : 'pointer', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', 
+              boxShadow: '0 20px 40px rgba(239, 68, 68, 0.2)',
+              opacity: (isSubmitting || isCompleted) ? 0.8 : 1
+            }}
           >
-            {isCompleted ? <ShieldCheck size={24} /> : <Terminal size={24} />}
-            {isCompleted ? "Protocol Secured" : "Initialize Patch Sequence"}
+            {isSubmitting ? (
+              <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }}>
+                <Activity size={24} />
+              </motion.div>
+            ) : isCompleted ? (
+              <ShieldCheck size={24} />
+            ) : (
+              <Terminal size={24} />
+            )}
+            {isSubmitting ? submissionStep : isCompleted ? "Solution Uploaded to Global Feed" : "Verify & Automate Portfolio Upload"}
           </button>
         </div>
 
