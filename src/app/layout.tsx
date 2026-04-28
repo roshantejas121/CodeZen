@@ -8,7 +8,7 @@ import { UserProvider } from '@/context/UserContext';
 import { Premium3DBackground } from "@/components/Premium3DBackground";
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://codezen-live-rho.vercel.app'),
+  metadataBase: new URL('https://devgrowth-beta.vercel.app'),
   title: "CodeZen | Elite Engineering Hub",
   description: "Elite engineering guidance, cognitive friction drills, and developer productivity.",
 };
