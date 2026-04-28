@@ -7,6 +7,8 @@ import { CommandPalette } from '@/components/CommandPalette';
 import { UserProvider } from '@/context/UserContext';
 import { Premium3DBackground } from "@/components/Premium3DBackground";
 
+import { Providers } from "@/components/Providers";
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://devgrowth-beta.vercel.app'),
   title: "CodeZen | Elite Engineering Hub",
@@ -21,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body style={{ margin: 0 }}>
-        <UserProvider>
+        <Providers>
           <Premium3DBackground />
           <Toaster position="top-right" richColors />
           <CommandPalette />
@@ -32,7 +34,7 @@ export default function RootLayout({
             </main>
           </div>
           <AIMentor />
-        </UserProvider>
+        </Providers>
       </body>
     </html>
   );

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
   LayoutDashboard, BookOpen, Code2, Trophy, Settings,
-  Zap, Book, Search, Target, Flame, Star, ShieldAlert
+  Zap, Book, Search, Target, Flame, Star, ShieldAlert, Terminal
 } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 import { motion } from "framer-motion";
@@ -21,6 +21,7 @@ const menuItems = [
   { icon: Zap,             label: "CZ Workouts",    href: "/dojo" },
   { icon: Target,          label: "Daily Drills",   href: "/drills" },
   { icon: ShieldAlert,     label: "Shadow Ops",     href: "/shadow" },
+  { icon: Terminal,        label: "The Hub",        href: "/problems" },
   { icon: Trophy,          label: "Leaderboard",    href: "/leaderboard" },
 ];
 
