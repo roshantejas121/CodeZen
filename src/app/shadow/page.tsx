@@ -17,26 +17,40 @@ import { toast } from "sonner";
 
 const SHADOW_DRILLS = [
   {
-    id: "log4j-patch",
-    title: "Zero-Day: Log4Shell Remediation",
+    id: "redis-distributed-lock",
+    title: "Infra: Distributed Locking Mechanism",
     difficulty: "Elite",
-    xpReward: 2500,
-    timeLimit: "15:00",
-    description: "A critical RCE vulnerability has been detected in the logger. Implement a context-aware lookup filter to sanitize input before it reaches the formatting engine.",
-    vulnerability: "Log4j JNDI Lookup Injection",
-    initialCode: "public class Logger {\n    public void log(String msg) {\n        // Vulnerable JNDI lookup follows:\n        System.out.println(\"Logging: \" + msg);\n    }\n}",
-    hint: "Intercept '${jndi:' patterns and return a sanitized string."
+    xpReward: 3500,
+    timeLimit: "25:00",
+    description: "Our payment gateway is processing duplicate transactions due to race conditions across multiple microservices. Implement a robust distributed lock using Redis with a fail-safe TTL and atomic acquisition to ensure idempotent processing.",
+    vulnerability: "Distributed Race Condition / Double Spend",
+    initialCode: "async function processPayment(txnId) {\n    // Acquire lock here to prevent race conditions\n    const lockKey = `lock:txn:${txnId}`;\n    \n    // TODO: Implement atomic lock acquisition with TTL\n    const acquired = false;\n\n    if (acquired) {\n        try {\n            await executeTransaction(txnId);\n        } finally {\n            // TODO: Release lock safely\n        }\n    }\n}",
+    hint: "Use the atomic 'SET key value NX PX 30000' command. Ensure you only release the lock if you still own it (use a unique value).",
+    language: "javascript"
   },
   {
-    id: "sql-injection",
-    title: "Shadow Drill: SQL Sanitization",
+    id: "api-rate-limiter",
+    title: "Security: Sliding Window Rate Limiter",
     difficulty: "Advanced",
-    xpReward: 1500,
-    timeLimit: "10:00",
-    description: "An attacker is attempting to bypass authentication using UNION based injection. Rewrite the raw query using prepared statements.",
-    vulnerability: "Classic SQL Injection",
-    initialCode: "String query = \"SELECT * FROM users WHERE id = '\" + inputId + \"'\";",
-    hint: "Use PreparedStatement placeholders (?) instead of string concatenation."
+    xpReward: 2200,
+    timeLimit: "15:00",
+    description: "The Auth API is under a credential stuffing attack. Implement a precision sliding window rate limiter (Token Bucket or ZSET based) to restrict users to 5 attempts per minute with zero burst overflow.",
+    vulnerability: "API Abuse / Brute Force",
+    initialCode: "class RateLimiter {\n    async canRequest(userId) {\n        const now = Date.now();\n        const window = 60000; // 1 minute\n        \n        // TODO: Implement sliding window logic\n        // 1. Remove expired timestamps\n        // 2. Count current window\n        // 3. Add new timestamp if under limit\n        \n        return true;\n    }\n}",
+    hint: "Using a Redis Sorted Set (ZSET) is the most accurate way. Use ZREMRANGEBYSCORE to clear old requests.",
+    language: "javascript"
+  },
+  {
+    id: "memory-leak-fix",
+    title: "Perf: Buffer Pool Leak Remediation",
+    difficulty: "Elite",
+    xpReward: 3000,
+    timeLimit: "20:00",
+    description: "The real-time analytics engine crashes every 48 hours due to a heap overflow. We've identified a leaked BufferPool in the WebSocket stream handler. Implement proper resource lifecycle management.",
+    vulnerability: "Memory Leak / Resource Exhaustion",
+    initialCode: "function handleTelemetryStream(socket) {\n    const sessionBuffer = BufferPool.acquire(65536);\n\n    socket.on('message', (data) => {\n        // Process telemetry data using sessionBuffer\n        processData(sessionBuffer, data);\n    });\n\n    // FIXME: sessionBuffer is never returned to the pool\n}",
+    hint: "Listen for 'close', 'error', and 'end' events. Use a single cleanup function to return the buffer to the pool.",
+    language: "javascript"
   }
 ];
 
@@ -117,7 +131,7 @@ export default function ShadowDrillsPage() {
           </div>
 
           <div style={{ flex: 1, minHeight: '400px' }}>
-            <LiveEditor initialCode={activeDrill.initialCode} language="java" hideSelector />
+            <LiveEditor initialCode={activeDrill.initialCode} language={(activeDrill as any).language || "javascript"} hideSelector />
           </div>
 
           <button 
