@@ -29,8 +29,12 @@ export default function ProblemsPage() {
       {/* Search & Action Bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '48px' }}>
         <div>
-          <h1 style={{ fontSize: '42px', fontWeight: 900, letterSpacing: '-1px' }}>Global Problems</h1>
-          <p style={{ color: 'var(--text-muted)', marginTop: '8px' }}>Solve real-world engineering challenges and build your reputation.</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#10b981', marginBottom: '8px' }}>
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }} className="animate-pulse" />
+            <span style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '2px' }}>System Ready: Nodes Online</span>
+          </div>
+          <h1 style={{ fontSize: '42px', fontWeight: 900, letterSpacing: '-1px' }}>Global Hub</h1>
+          <p style={{ color: 'var(--text-muted)', marginTop: '8px' }}>Expert-led problems, AI-ranked solutions, and professional reputation.</p>
         </div>
         <Link href="/problems/new">
           <motion.button 
