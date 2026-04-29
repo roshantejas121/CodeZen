@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { Groq } from "groq-sdk";
-import connectDB from "@/lib/db";
+import connectDB from "@/lib/mongodb";
 import Problem from "@/lib/models/Problem";
 
 const groq = new Groq({

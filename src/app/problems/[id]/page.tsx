@@ -33,18 +33,18 @@ export default function ProblemDetailPage() {
 
   const handleExecute = async () => {
     toast.loading("Executing code...");
-    const res = await fetch("/api/execute", {
+    const res = await fetch("/api/compiler", {
       method: "POST",
       body: JSON.stringify({
-        language_id: 63, // JavaScript (Node.js) - check Judge0 docs for others
-        source_code: code,
+        language: problem.language || "javascript",
+        code: code,
       }),
     });
     const result = await res.json();
-    setExecResult(result);
+    setExecResult({ stdout: result.output, stderr: result.hasError ? result.output : null });
     toast.dismiss();
-    if (result.stdout) toast.success("Execution completed!");
-    else if (result.stderr) toast.error("Execution error!");
+    if (!result.hasError) toast.success("Execution completed!");
+    else toast.error("Execution error!");
   };
 
   const handleSubmitSolution = async () => {
